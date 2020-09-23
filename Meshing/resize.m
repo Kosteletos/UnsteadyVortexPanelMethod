@@ -1,4 +1,4 @@
-function [xsin,ysin] = resyze(xshr,yshr)
+function [xsin,ysin] = resize(xshr,yshr)
 %
 %  [xsin,ysin] = resyze(xshr,yshr)
 %

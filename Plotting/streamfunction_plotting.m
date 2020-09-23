@@ -37,11 +37,12 @@ function streamfunction_plotting(gamma, xs, ys, alpha_rad,ipstag)
     contour(xm,ym,psi,c,'b')
     hold on
     contour(xm,ym,psi,[psi_stag,psi_stag],'r','linewidth',1)
-    fill(xs,ys,'k');
+    plot(xs,ys,'k');
+    %fill(xs,ys,'k');
     hold off 
     xlabel('x')
     ylabel('y')
     set(gca,'Fontn','Times','FontSize',10,'linewidth',1)
-    title(strcat('Streamlines at alpha_rad=',num2str(alpha_rad*360/(2*pi))));
+    title(strcat('Streamlines at alpha (deg) =',num2str(alpha_rad*360/(2*pi))));
     
 end
