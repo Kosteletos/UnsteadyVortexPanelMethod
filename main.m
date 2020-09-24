@@ -5,6 +5,7 @@
 %
 
 clear all
+close all
 addpath(genpath(pwd))
 
 %  Read in the parameter file
@@ -44,11 +45,13 @@ for t = 1:nt
     %    calculate cp distribution and overall circulation
     [cp, TotalCirc, FinalPanelCirc] = potential_op ( xs, ys, gam );
 
-    [xfsVortex, yfsVortex, gamfsVortex] = BiotSavart(FinalPanelCirc, xs, ys, xfsVortex, yfsVortex, gamfsVortex);
+    [xfsVortex, yfsVortex, gamfsVortex] = BiotSavart(FinalPanelCirc, dt, xs, ys, gam, xfsVortex, yfsVortex, gamfsVortex);
 
     %    locate stagnation point and calculate stagnation panel length
     [ipstag, fracstag] = find_stag(gam);
     dsstag = sqrt((xs(ipstag+1)-xs(ipstag))^2 + (ys(ipstag+1)-ys(ipstag))^2);
 
-    streamfunction_plotting(gam, xs, ys, alpha_rad,ipstag);
+
 end
+
+streamfunction_plotting(gam, xs, ys, alpha_rad, ipstag, xfsVortex, yfsVortex);

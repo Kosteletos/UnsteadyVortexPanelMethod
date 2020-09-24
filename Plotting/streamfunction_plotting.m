@@ -1,4 +1,4 @@
-function streamfunction_plotting(gamma, xs, ys, alpha_rad,ipstag)
+function streamfunction_plotting(gamma, xs, ys, alpha_rad, ipstag, xfsVortex, yfsVortex)
 
     xmin =-0.5;
     xmax =1.5;
@@ -16,11 +16,18 @@ function streamfunction_plotting(gamma, xs, ys, alpha_rad,ipstag)
     
     psi = ym;
     
+    % Rotate body
     xy = [xs.',ys.'];
     R = [cos(alpha_rad) -sin(alpha_rad); sin(alpha_rad) cos(alpha_rad)]; % Rotation matrix
     xy_rot = xy*R;
     xs = xy_rot(:,1);
     ys = xy_rot(:,2);
+    
+    %Rotate vortices
+    xy_v = [xfsVortex.', yfsVortex.'];
+    xy_v_rot = xy_v*R;
+    xv_rot = xy_v_rot(:,1);
+    yv_rot = xy_v_rot(:,2);
     
    for i = 1:np
         gamma_a = gamma(i);
@@ -38,7 +45,7 @@ function streamfunction_plotting(gamma, xs, ys, alpha_rad,ipstag)
     hold on
     contour(xm,ym,psi,[psi_stag,psi_stag],'r','linewidth',1)
     plot(xs,ys,'k','linewidth',2);
-    %fill(xs,ys,'k');
+    plot(xv_rot, yv_rot,'g','linewidth',2);
     hold off 
     xlabel('x')
     ylabel('y')
