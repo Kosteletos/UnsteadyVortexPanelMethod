@@ -19,7 +19,9 @@ fprintf(1, '%s\n\n', ['Reading in parameter file: ' parfile])
 secfile = ['BodyGeom/' section '.surf'];
 [xk, yk] = textread ( secfile, '%f%f' );
 
-fsVortex = [];
+xfsVortex = [];
+yfsVortex = [];
+gamfsVortex = [];
 
 %Generate flat plate surface description:
 xs = linspace(0,1,np);
@@ -42,7 +44,7 @@ for t = 1:nt
     %    calculate cp distribution and overall circulation
     [cp, TotalCirc, FinalPanelCirc] = potential_op ( xs, ys, gam );
 
-    [fsVortex] = BiotSavart(FinalPanelCirc, xs, ys, fsVortex);
+    [xfsVortex, yfsVortex, gamfsVortex] = BiotSavart(FinalPanelCirc, xs, ys, xfsVortex, yfsVortex, gamfsVortex);
 
     %    locate stagnation point and calculate stagnation panel length
     [ipstag, fracstag] = find_stag(gam);
