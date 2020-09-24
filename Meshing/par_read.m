@@ -1,4 +1,4 @@
-function [section, np, Re, alpha] = par_read(parfile)
+function [section, np, Re, alpha, nt] = par_read(parfile)
 %
 %  function [section np Re alpha] = par_read(parfile)
 %
@@ -29,4 +29,7 @@ alfswp = inputline(35:length(inputline));
 disp(['Range of incidences (degrees): ' alfswp])
 alpha = eval(alfswp);
 
+inputline=fgetl(fid);
+nt = sscanf(inputline(35:length(inputline)),'%i');
+disp(['Number of time steps: ' num2str(nt)])
 fclose(fid);

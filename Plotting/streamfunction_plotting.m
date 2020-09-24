@@ -37,7 +37,7 @@ function streamfunction_plotting(gamma, xs, ys, alpha_rad,ipstag)
     contour(xm,ym,psi,c,'b')
     hold on
     contour(xm,ym,psi,[psi_stag,psi_stag],'r','linewidth',1)
-    plot(xs,ys,'k');
+    plot(xs,ys,'k','linewidth',2);
     %fill(xs,ys,'k');
     hold off 
     xlabel('x')
