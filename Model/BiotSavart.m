@@ -11,11 +11,13 @@ for i = 1:inputSize(2)
     u = 0;
     v = 0;
     for j = 1:(length(xs)-1)
-        %[infau, infav, infbu, infbv ] = InfCoeffDerivative(xs(j),ys(j),xs(j+1),ys(j+1),xfsVortex(i),yfsVortex(i));
-        %u = u + gam(j)*infau + gam(j+1)*infbu;
-        %v = v + gam(j)*infav + gam(j+1)*infbv;
+        [infau, infav, infbu, infbv ] = InfCoeffDerivative(xs(j),ys(j),xs(j+1),ys(j+1),xfsVortex(i),yfsVortex(i));
+        u = u + gam(j)*infau + gam(j+1)*infbu;
+        v = v + gam(j)*infav + gam(j+1)*infbv;
     end     
-    u = u + 0.1; % needs deleting !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! 
+    %u = u + 0.1; % needs deleting once above is working !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    % try getting (build_rhs and BC's working before diving into why above
+    % isn't working
     
     % Add contribution from other free vortices here
     for k = 1:inputSize(2)

@@ -2,16 +2,15 @@
 %
 %  Script to analyse an aerofoil section using potential flow calculation
 %  
-%
 
-clear all
+
 close all
 addpath(genpath(pwd))
 
 %  Read in the parameter file
 %caseref = input('Enter case reference: ','s');
 %parfile = ['Parfiles/' caseref '.txt'];
-parfile = ['Parfiles/FlatPlate.txt'];
+parfile = ('Parfiles/FlatPlate.txt');
 %parfile = ['Parfiles/test.txt'];
 fprintf(1, '%s\n\n', ['Reading in parameter file: ' parfile])
 [section, np, Re, alpha_deg, nt] = par_read(parfile);
@@ -28,7 +27,8 @@ gamfsVortex = [];
 xs = linspace(0,1,np);
 ys = zeros(1,np);
 
-dt = 1;
+dt = 0.01;
+nt = 50;
 for t = 1:nt 
     %  Assemble the lhs of the equations for the potential flow calculation
     A = build_lhs ( xs, ys );
@@ -37,7 +37,7 @@ for t = 1:nt
 
     %    rhs of equations
     alpha_rad = pi * alpha_deg/180;
-    b = build_rhs ( xs, ys, alpha_rad );
+    b = build_rhs ( xs, ys, alpha_rad, xfsVortex, yfsVortex, gamfsVortex);
 
     %    solve for surface vortex sheet strength
     gam = Am1 * b;
