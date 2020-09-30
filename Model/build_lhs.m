@@ -27,8 +27,21 @@ end
 lhsmat = zeros(np+1,np+1);
 
 psip_shift = circshift(psip,-1,1); % Shifted psip == psip(i+1,j)
-lhsmat(1:np,:) = psip_shift(1:np,:)-psip(1:np,:); %these dimensions to leave final row zeros
+lhsmat(1:np-1,:) = psip_shift(1:np-1,:)-psip(1:np-1,:); %these dimensions to leave final row zeros
 
+% Steady kutta condition - some sources say this is still fine for
+% unsteady?
+lhsmat(np,1) = 1;
+lhsmat(np,2) = -1;
+lhsmat(np,3)=1/2;
+lhsmat(np,np-1) = -1/2;
+lhsmat(np,np) = 1;
+
+% Complete loop: gam_(1) = gam_(np+1) 
+%lhsmat(np+1,1)=1;
+%lhsmat(np+1,np+1) = 1;
+
+% Total circulation BC
 lhsmat(np+1,:)=ones(1,np+1);
 end
 

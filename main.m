@@ -5,6 +5,7 @@
 
 
 close all
+clear all
 addpath(genpath(pwd))
 
 %  Read in the parameter file
@@ -19,16 +20,25 @@ fprintf(1, '%s\n\n', ['Reading in parameter file: ' parfile])
 secfile = ['BodyGeom/' section '.surf'];
 [xk, yk] = textread ( secfile, '%f%f' );
 
+%  Generate high-resolution surface description via cubic splines
+nphr = 5*np;
+[xshr, yshr] = splinefit ( xk, yk, nphr );
+
+%  Resize section so that it lies between (0,0) and (1,0)
+[xsin, ysin] = resize ( xshr, yshr );
+
+%  Interpolate to required number of panels (uniform size)
+[xs, ys] = make_upanels ( xsin, ysin, np );
+
 xfsVortex = [];
 yfsVortex = [];
 gamfsVortex = [];
 
 %Generate flat plate surface description:
-xs = linspace(0,1,np);
-ys = zeros(1,np);
+%xs = linspace(0,1,np);
+%ys = zeros(1,np);
 
 dt = 0.01;
-nt = 50;
 for t = 1:nt 
     %  Assemble the lhs of the equations for the potential flow calculation
     A = build_lhs ( xs, ys );
