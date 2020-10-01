@@ -8,40 +8,27 @@ close all
 clear all
 addpath(genpath(pwd))
 
-%  Read in the parameter file
-%caseref = input('Enter case reference: ','s');
-%parfile = ['Parfiles/' caseref '.txt'];
-parfile = ('Parfiles/FlatPlate.txt');
-%parfile = ['Parfiles/test.txt'];
-fprintf(1, '%s\n\n', ['Reading in parameter file: ' parfile])
-[section, np, Re, alpha_deg, nt] = par_read(parfile);
+alpha0_deg = 30; % Initial angle of attack (degrees)
+np = 10; % Number of panels
+V = 1; % Free-stream velocity
 
-%  Read in the section geometry
-secfile = ['BodyGeom/' section '.surf'];
-[xk, yk] = textread ( secfile, '%f%f' );
-
-%  Generate high-resolution surface description via cubic splines
-nphr = 5*np;
-[xshr, yshr] = splinefit ( xk, yk, nphr );
-
-%  Resize section so that it lies between (0,0) and (1,0)
-[xsin, ysin] = resize ( xshr, yshr );
-
+alpha0_rad = alpha0_deg*pi/180;
+initital_position = [0,0 ; cos(alpha0_rad), -sin(alpha0_rad)]; %xy_start ; xy_end
 %  Interpolate to required number of panels (uniform size)
-[xs, ys] = make_upanels ( xsin, ysin, np );
+[xyPanel, xyCollocation, xyBoundVortex] = makePanels(initital_position, np);
+scatter(xyPanel(:,1), xyPanel(:,2), 'filled');
+hold on;
+scatter(xyCollocation(:,1), xyCollocation(:,2), 'filled');
+scatter(xyBoundVortex(:,1), xyBoundVortex(:,2), 'filled');
+hold off;
 
-xfsVortex = [];
-yfsVortex = [];
-gamfsVortex = [];
+xygFSVortex = [];
 
-%Generate flat plate surface description:
-%xs = linspace(0,1,np);
-%ys = zeros(1,np);
 
 dt = 0.01;
 for t = 1:nt 
     %  Assemble the lhs of the equations for the potential flow calculation
-    A = build_lhs ( xs, ys );
+    A = build_lhs (xs, ys);
     Am1 = inv(A);
 
 
