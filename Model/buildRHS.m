@@ -1,9 +1,9 @@
-function [b] = buildRHS(V, alpha_rad, normal, np)
+function [b] = buildRHS(V, normal, np)
 %Build RHS of matrix A.gam = b
 b = zeros([np,1]);
 
 for i = 1:np
-    uvFS = [V*cos(alpha_rad), V*sin(alpha_rad)];
+    uvFS = [V, 0];
     b(i) = -dot(uvFS, normal);
 end
 

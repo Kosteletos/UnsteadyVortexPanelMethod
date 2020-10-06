@@ -9,7 +9,7 @@ clear all
 addpath(genpath(pwd))
 
 alpha0_deg = 10; % Initial angle of attack (degrees)
-np = 10; % Number of panels
+np = 100; % Number of panels
 t = 1; % Simulation time [s]
 dt = 0.1; % Time step [s]
 V = 1; % Free-stream velocity
@@ -37,7 +37,7 @@ for t = 1:1
     A = buildLHS(xyCollocation, xyBoundVortex, normal, np);
     Am1 = inv(A);
 
-    b = buildRHS(V, alpha0_rad, normal, np);
+    b = buildRHS(V, normal, np);
 
     %    solve for surface vortex sheet strength
     gam = Am1 * b;
@@ -47,11 +47,6 @@ for t = 1:1
 
     %[xfsVortex, yfsVortex, gamfsVortex] = biotSavart(FinalPanelCirc, dt, xs, ys, gam, xfsVortex, yfsVortex, gamfsVortex);
 
-    %    locate stagnation point and calculate stagnation panel length
-    %[ipstag, fracstag] = find_stag(gam);
-    %dsstag = sqrt((xs(ipstag+1)-xs(ipstag))^2 + (ys(ipstag+1)-ys(ipstag))^2);
-
-
 end
 
-streamfunction_plotting(gam, xyPanel, xyBoundVortex, alpha0_rad);
+streamfunction_plotting(gam, xyPanel, xyBoundVortex, alpha0_rad, np);
