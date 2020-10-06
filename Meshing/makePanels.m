@@ -1,24 +1,27 @@
-function [xyPanel, xyCollocation, xyBoundVortex] = makePanels(position, np);
+function [xyPanel, xyCollocation, xyBoundVortex, normal] = makePanels(position, np);
+
+normal = [position(2,2)-position(1,2) , position(2,1)-position(1,1)];
+normal = normal/(sqrt(normal(1)^2+normal(2)^2));
 
 xPanLength = (position(2,1)-position(1,1))/np;
 yPanLength = (position(2,2)-position(1,2))/np;
-PanLength = sqrt(xPanLength^2 + yPanLength^2)
+PanLength = sqrt(xPanLength^2 + yPanLength^2);
 
 %Body Panels
-xp = linspace(position(1,1), position(2,1),np);
-yp = linspace(position(1,2), position(2,2),np);
+xp = linspace(position(1,1), position(2,1),np+1);
+yp = linspace(position(1,2), position(2,2),np+1);
 xyPanel = [xp.', yp.'];
 
 %Collocation Points
-xc = linspace(position(1,1) + 3*xPanLength/4, position(2,1) - xPanLength/4, np-1);
-yc = linspace(position(1,2) + 3*yPanLength/4, position(2,2) - yPanLength/4, np-1);
+xc = linspace(position(1,1) + 3*xPanLength/4, position(2,1) - xPanLength/4, np);
+yc = linspace(position(1,2) + 3*yPanLength/4, position(2,2) - yPanLength/4, np);
 xyCollocation = [xc.', yc.'];
 
 %Bound Vortex Positions
-xv = linspace(position(1,1) + xPanLength/4, position(2,1) - 3*xPanLength/4, np-1);
-yv = linspace(position(1,2) + yPanLength/4, position(2,2) - 3*yPanLength/4, np-1);
-xv(np) = position(2,1);
-yv(np) = position(2,2);
+xv = linspace(position(1,1) + xPanLength/4, position(2,1) - 3*xPanLength/4, np);
+yv = linspace(position(1,2) + yPanLength/4, position(2,2) - 3*yPanLength/4, np);
+xv(np+1) = position(2,1);
+yv(np+1) = position(2,2);
 
 xyBoundVortex = [xv.', yv.'];
 
