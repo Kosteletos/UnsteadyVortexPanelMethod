@@ -16,6 +16,8 @@ alpha0_rad = alpha0_deg*pi/180;
 initital_position = [0,0 ; cos(alpha0_rad), -sin(alpha0_rad)]; %xy_start ; xy_end
 %  Interpolate to required number of panels (uniform size)
 [xyPanel, xyCollocation, xyBoundVortex] = makePanels(initital_position, np);
+
+%Plot aerofoil
 scatter(xyPanel(:,1), xyPanel(:,2), 'filled');
 hold on;
 scatter(xyCollocation(:,1), xyCollocation(:,2), 'filled');
@@ -42,7 +44,7 @@ for t = 1:nt
     %    calculate cp distribution and overall circulation
     [cp, TotalCirc, FinalPanelCirc] = potential_op ( xs, ys, gam );
 
-    [xfsVortex, yfsVortex, gamfsVortex] = BiotSavart(FinalPanelCirc, dt, xs, ys, gam, xfsVortex, yfsVortex, gamfsVortex);
+    [xfsVortex, yfsVortex, gamfsVortex] = biotSavart(FinalPanelCirc, dt, xs, ys, gam, xfsVortex, yfsVortex, gamfsVortex);
 
     %    locate stagnation point and calculate stagnation panel length
     [ipstag, fracstag] = find_stag(gam);
