@@ -1,6 +1,6 @@
 function [NEWxygFSVortex] = biotSavart(dt, np, xyPanel, xyBoundVortex, gam, xygFSVortex)
-% Vortex transport of existing vortices and movement of trailing edge
-% vortex into free stream
+% Vortex transport of existing vortices and movement of LE and TE
+% vortices into free stream
 
 inputSize = size(xygFSVortex);
 NEWxygFSVortex = zeros(inputSize);
@@ -11,17 +11,13 @@ for i = 1:inputSize(1)
     
     % Contribution due to bound vorticity
     for j = 1:np+1
-        uv = uv + inducedVelocity(gam(j), xygFSVortex(i,1:2), xyBoundVortex(j,1:2)); %needs testing
+        uv = uv + inducedVelocity(gam(j), xygFSVortex(i,1:2), xyBoundVortex(j,:));
     end     
 
     % Contribution due to other wake vortices
     for k = 1:inputSize(1)
-        if k ~= i
-            delxy = xygFSVortex(k,1:2)-xygFSVortex(i,1:2);
-            r = norm(delxy);
-            r_sq = r^2;
-            
-            uv = uv + (xygFSVortex(k,3)/(2*pi*r_sq))*[-delxy(2) , delxy(1)];
+        if k ~= i            
+            uv = uv + inducedVelocity(xygFSVortex(k,3), xygFSVortex(i,1:2), xygFSVortex(k,1:2));
         end
     end
     
