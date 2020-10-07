@@ -1,51 +1,42 @@
-function [NEWxfsVortex,NEWyfsVortex,NEWgamfsVortex] = BiotSavart(FinalPanelCirc, dt, xs, ys, gam, xfsVortex, yfsVortex, gamfsVortex)
+function [NEWxygFSVortex] = biotSavart(dt, np, xyPanel, xyBoundVortex, gam, xygFSVortex)
 % Vortex transport of existing vortices and movement of trailing edge
 % vortex into free stream
 
-inputSize = size(xfsVortex);
-NEWxfsVortex = zeros(inputSize);
-NEWyfsVortex = zeros(inputSize);
-NEWgamfsVortex = zeros(inputSize);
+inputSize = size(xygFSVortex);
+NEWxygFSVortex = zeros(inputSize);
 
-for i = 1:inputSize(2)
-    u = 0;
-    v = 0;
-    for j = 1:(length(xs)-1)
-        [infau, infav, infbu, infbv ] = InfCoeffDerivative(xs(j),ys(j),xs(j+1),ys(j+1),xfsVortex(i),yfsVortex(i));
-        u = u + gam(j)*infau + gam(j+1)*infbu;
-        v = v + gam(j)*infav + gam(j+1)*infbv;
-    end     
-    %u = u + 0.1; % needs deleting once above is working !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    % try getting (build_rhs and BC's working before diving into why above
-    % isn't working
+
+for i = 1:inputSize(1)
+    uv = [0,0];
     
-    % Add contribution from other free vortices here
-    for k = 1:inputSize(2)
+    % Contribution due to bound vorticity
+    for j = 1:np+1
+        uv = uv + inducedVelocity(gam(j), xygFSVortex(i,1:2), xyBoundVortex(j,1:2)); %needs testing
+    end     
+
+    % Contribution due to other wake vortices
+    for k = 1:inputSize(1)
         if k ~= i
-            %relative coords
-            delx = xfsVortex(k) - xfsVortex(i);
-            dely = yfsVortex(k) - yfsVortex(i);
-            r_sq = delx^2 + dely^2;
+            delxy = xygFSVortex(k,1:2)-xygFSVortex(i,1:2);
+            r = norm(delxy);
+            r_sq = r^2;
             
-            u = u - dely*gamfsVortex(k)/(2*pi*r_sq);
-            v = v + delx*gamfsVortex(k)/(2*pi*r_sq);
+            uv = uv + (xygFSVortex(k,3)/(2*pi*r_sq))*[-delxy(2) , delxy(1)];
         end
     end
     
     % Distance travelled by vortex
-    dx = u * dt;
-    dy = v * dt;
+    dxy = uv * dt;
     
-    % New vortex position 
-    NEWxfsVortex(i) = xfsVortex(i) + dx;
-    NEWyfsVortex(i) = yfsVortex(i) + dy;
-    NEWgamfsVortex(i) = gamfsVortex(i);
+    % New vortex position
+    NEWxygFSVortex(i,:) = xygFSVortex(i,:) + [dxy,0];
+   
 end
 
-% Trailing edge circulation leaves trailing edge and joins free-stream
-NEWxfsVortex = [NEWxfsVortex, xs(end)];
-NEWyfsVortex = [NEWyfsVortex, ys(end)];
-NEWgamfsVortex = [NEWgamfsVortex, FinalPanelCirc];
-
+% This needs work, the new vortex doesn't necessarily go at the end point
+% of the panel, but more likely at 0.2-0.3 times the distance travelled by
+% the trailing edge in this times step
+NEWxygFSVortex = [NEWxygFSVortex; xyBoundVortex(end,1) ,xyBoundVortex(end,2), gam(end)];
+NEWxygFSVortex = [xyPanel(1,1) ,xyPanel(1,2), gam(1) ; NEWxygFSVortex];
 end
 
