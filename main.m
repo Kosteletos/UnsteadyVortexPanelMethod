@@ -3,14 +3,14 @@ clear all
 addpath(genpath(pwd))
 
 np = 100; % Number of panels
-t = 1; % Simulation time [s]
+t = 0.2; % Simulation time [s]
 dt = 0.05; % Time step [s]
 
 xygFSVortex = []; %Initial Free stream vortices
 totalBoundCirc = 0;
 
-tc = t/dt;
-for tc = 0:tc
+tn = t/dt;
+for tc = 0:tn
     t = tc*dt;
     
     [pos, vel, alpha, alphaDot] = kinematics(t);
@@ -27,17 +27,20 @@ for tc = 0:tc
     % Solve for surface vortex sheet strength
     gam = A\b; 
     
+    uv_vec = testUV(xyCollocation, xyBoundVortex, np, gam);
+    
     % Calculate bound circulation
     totalBoundCirc = totalBoundCirculation(gam, np);
-    
-    %streamfunctionPlotting(gam, xyPanel, xyBoundVortex, xygFSVortex, alpha, np);
+    %if tc==0
+    %streamfunctionPlotting(gam, xyPanel, xyBoundVortex,uv_vec, xygFSVortex, xyCollocation, alpha, np);
+    %end
     
     % Wake moves with flow, trailing edge vortex is released 
     [xygFSVortex] = biotSavart(dt, np, xyPanel, xyBoundVortex, gam, xygFSVortex);
 
 end
 
-streamfunctionPlotting(gam, xyPanel, xyBoundVortex, xygFSVortex, alpha, np);
+streamfunctionPlotting(gam, xyPanel, xyBoundVortex, uv_vec, xygFSVortex,xyCollocation, alpha, np);
 
 
 

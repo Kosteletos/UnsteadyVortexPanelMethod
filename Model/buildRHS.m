@@ -6,6 +6,10 @@ for i = 1:np
     
     %Velocity due to flat plate kinematics 
     r = norm(xyCollocation(i,:) - pos);
+    if i >= np/2
+        r = -r;
+    end
+    
     uvKinematics = vel + thetaDot*r*[sin(theta), cos(theta)];
     
     % Wake induced velocity
@@ -17,6 +21,9 @@ for i = 1:np
     end
     
     uv = uvFSVortex - uvKinematics;
+    %Free stream velicity
+    uv = uv + [1,0];
+    
     b(i) = -dot(uv, normal);
 end
 

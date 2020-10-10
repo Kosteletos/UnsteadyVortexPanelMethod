@@ -9,11 +9,11 @@ pos = [vel(1)*t,vel(2)*t];
 %alpha = sin(omega*t);
 %alphaDot = omega*cos(omega*t);
 
-%alphaDot = 0.4;
+%alphaDot = 0.01;
 %alpha = alphaDot * t;
 
 alphaDot = 0;
-alpha = 0.5;
+alpha = 1;
 
 end
 

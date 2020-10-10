@@ -32,7 +32,11 @@ end
 % This needs work, the new vortex doesn't necessarily go at the end point
 % of the panel, but more likely at 0.2-0.3 times the distance travelled by
 % the trailing edge in this times step
-NEWxygFSVortex = [NEWxygFSVortex; xyBoundVortex(end,1) ,xyBoundVortex(end,2), gam(end)];
+
+%test half way point
+
+
+NEWxygFSVortex = [NEWxygFSVortex; xyPanel(end,1) ,xyPanel(end,2), gam(end)];
 NEWxygFSVortex = [xyPanel(1,1) ,xyPanel(1,2), gam(1) ; NEWxygFSVortex];
 end
 
