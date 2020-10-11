@@ -8,7 +8,6 @@ xygFSVortex_rel = [xyPanel_rel(1,1) ,xyPanel_rel(1,2), gam(1) ; xygFSVortex_rel]
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 inputSize = size(xygFSVortex_rel);
-NEWxygFSVortex = zeros(inputSize);
 
 % velocity due to wake
 inerToRel = [cos(alpha), -sin(alpha); sin(alpha), cos(alpha)]; % inertial frame to relative frame
@@ -22,8 +21,29 @@ uvKinematics = uvKinVel - uvKinRot;
 
 xygFSVortex_rel(:,1:2) = xygFSVortex_rel(:,1:2) - uvKinematics*dt;
 
+%%%
+for i = 1:inputSize(1)
+    uv = [0,0];
+    
+    % Contribution due to bound vorticity (not including TE Wake)
+    for j = 1:np
+        uv = uv + inducedVelocity(gam(j), xygFSVortex_rel(i,1:2), xyBoundVortex_rel(j,:));
+    end     
 
-
+    % Contribution due wake vortices (including TE wake)
+    for k = 1:inputSize(1)
+        if k ~= i            
+            uv = uv + inducedVelocity(xygFSVortex(k,3), xygFSVortex(i,1:2), xygFSVortex(k,1:2));
+        end
+    end
+    
+    % Distance travelled by vortex
+    dxy = uv * dt;
+    
+    % New vortex position
+    NEWxygFSVortex(i,:) = xygFSVortex(i,:) + [dxy,0];
+   
+end
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

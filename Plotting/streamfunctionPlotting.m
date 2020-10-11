@@ -1,4 +1,4 @@
-function streamfunctionPlotting(gam, xyPanel, xyBoundVortex,uv_vec, xygFSVortex, xyCollocation, alpha_rad, np)
+function streamfunctionPlotting(gam, xyPanel, xyBoundVortex,uv_vec, xygFSVortex_rel, xyCollocation, alpha_rad, np)
 
     xmin =-1.5;
     xmax =1.5;
@@ -22,10 +22,10 @@ function streamfunctionPlotting(gam, xyPanel, xyBoundVortex,uv_vec, xygFSVortex,
        psi = psi - (gam(i)/(2*pi))*log(r);
    end
    
-   inputSize = size(xygFSVortex);
+   inputSize = size(xygFSVortex_rel);
    for i = 1:inputSize(1)
-       xV = xygFSVortex(i,1);
-       yV = xygFSVortex(i,2);
+       xV = xygFSVortex_rel(i,1);
+       yV = xygFSVortex_rel(i,2);
        r = sqrt((xm-xV).^2 + (ym-yV).^2);  
        psi = psi - (gam(i)/(2*pi))*log(r);
    end
@@ -41,11 +41,11 @@ function streamfunctionPlotting(gam, xyPanel, xyBoundVortex,uv_vec, xygFSVortex,
     quiver(xyCollocation(:,1),xyCollocation(:,2),uv_vec(:,1),uv_vec(:,2) );
     
     plot(xyPanel(:,1),xyPanel(:,2),'k','linewidth',2);
-    if size(xygFSVortex) ~= 0
-        noVortices = size(xygFSVortex);
+    if size(xygFSVortex_rel) ~= 0
+        noVortices = size(xygFSVortex_rel);
         noVortices = noVortices(1);
-        plot(xygFSVortex(1:noVortices/2,1), xygFSVortex(1:noVortices/2,2));
-        plot(xygFSVortex(noVortices/2+1:noVortices,1), xygFSVortex(noVortices/2+1:noVortices,2));
+        plot(xygFSVortex_rel(1:noVortices/2,1), xygFSVortex_rel(1:noVortices/2,2));
+        plot(xygFSVortex_rel(noVortices/2+1:noVortices,1), xygFSVortex_rel(noVortices/2+1:noVortices,2));
         %scatter(xygFSVortex(:,1), xygFSVortex(:,2));
     end
     hold off 

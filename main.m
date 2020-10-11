@@ -35,11 +35,11 @@ for tc = 0:tn
     % Calculate bound circulation
     totalBoundCirc = totalBoundCirculation(gam, np);
     %if tc==0
-    streamfunctionPlotting(gam, xyPanel, xyBoundVortex,uv_vec, xygFSVortex_rel, xyCollocation, alpha, np);
+    streamfunctionPlotting(gam, xyPanel, xyBoundVortex, uv_vec, xygFSVortex_rel, xyCollocation, alpha, np);
     %end
     
     % Wake moves with flow, trailing edge vortex is released 
-    [xygFSVortex] = biotSavart(dt, np, vel, alpha, alphaDot, xyPanel_rel, xyBoundVortex_rel, gam, xygFSVortex_rel);
+    [xygFSVortex_rel] = biotSavart(dt, np, vel, alpha, alphaDot, xyPanel_rel, xyBoundVortex_rel, gam, xygFSVortex_rel);
 
 end
 
