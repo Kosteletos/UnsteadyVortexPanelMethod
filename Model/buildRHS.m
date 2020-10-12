@@ -18,7 +18,7 @@ b = zeros([np+1,1]);
     for i = 1:np
         for j = 1:noFreeVortices
             gam = xygFSVortex_rel(j,3);
-            uvFSVortex(i,:) = uvFSVortex(i,:) + inducedVelocity(gam,xyCollocation_rel(i,:), xygFSVortex_rel(j,1:2)); % does this need to be xygFSVortex_rel <- should apply transformations
+            uvFSVortex(i,:) = uvFSVortex(i,:) + inducedVelocity(gam,xyCollocation_rel(i,:), xygFSVortex_rel(j,1:2)); 
         end
     end
     

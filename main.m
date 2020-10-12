@@ -3,7 +3,7 @@ clear all
 addpath(genpath(pwd))
 
 np = 100; % Number of panels
-t = 0.2; % Simulation time [s]
+t = 2; % Simulation time [s]
 dt = 0.05; % Time step [s]
 
 xygFSVortex_rel = []; %Initial Free stream vortices
@@ -11,7 +11,7 @@ totalBoundCirc = 0;
 
 % Assemble lhs of the equation in relative coords (i.e doesn't change)
 [xyPanel_rel, xyCollocation_rel, xyBoundVortex_rel, normal_rel] = makePanels(0, [0,0], np);
-A = buildLHS(xyCollocation_rel, xyBoundVortex_rel, normal_rel, np);
+% A = buildLHS(xyCollocation_rel, xyBoundVortex_rel, normal_rel, np);
 
 tn = t/dt;
 for tc = 0:tn
@@ -19,7 +19,17 @@ for tc = 0:tn
     
     [pos, vel, alpha, alphaDot] = kinematics(t);
 
-    [xyPanel, xyCollocation, xyBoundVortex, normal] = makePanels(alpha, pos, np);
+    exists = exist('xyPanel', 'var');
+    if exists == 1 
+        xyPanelPrev = xyPanel;
+    end
+    [xyPanel, xyCollocation, xyBoundVortex, normal] = makePanels(alpha, -pos, np);
+    if exists == 1
+        xyBoundVortex_rel(end,:) = xyPanel_rel(end,:)+ xyPanelPrev(end,:)-xyPanel(end,:);
+    end
+    A = buildLHS(xyCollocation_rel, xyBoundVortex_rel, normal_rel, np);
+
+
     
     % Panel postion plotting Tool
     %panelPosPlotting(xyPanel, xyCollocation, xyBoundVortex);
@@ -35,7 +45,7 @@ for tc = 0:tn
     % Calculate bound circulation
     totalBoundCirc = totalBoundCirculation(gam, np);
     %if tc==0
-    streamfunctionPlotting(gam, xyPanel, xyBoundVortex, uv_vec, xygFSVortex_rel, xyCollocation, alpha, np);
+    %streamfunctionPlotting(alpha, pos, gam, xyPanel, xyBoundVortex, uv_vec, xygFSVortex_rel, xyCollocation, alpha, np);
     %end
     
     % Wake moves with flow, trailing edge vortex is released 
@@ -43,7 +53,7 @@ for tc = 0:tn
 
 end
 
-streamfunctionPlotting(gam, xyPanel, xyBoundVortex, uv_vec, xygFSVortex,xyCollocation, alpha, np);
+streamfunctionPlotting(alpha, -pos, gam, xyPanel, xyBoundVortex, uv_vec, xygFSVortex_rel, xyCollocation, alpha, np);
 
 
 
