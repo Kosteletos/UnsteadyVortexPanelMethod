@@ -3,7 +3,7 @@ function [xygFSVortex_rel] = biotSavart(dt, np, vel, alpha, alphaDot, xyPanel_re
 % vortices into free stream
 
 xygFSVortex_rel = [xygFSVortex_rel; xyPanel_rel(end,1) ,xyPanel_rel(end,2), gam(end)];
-%xygFSVortex_rel = [xyPanel_rel(1,1)-0.01 ,xyPanel_rel(1,2)+0.01, gam(1) ; xygFSVortex_rel];
+%xygFSVortex_rel = [xyPanel_rel(1,1), xyPanel_rel(1,2), 0.5*gam(1) ; xygFSVortex_rel];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

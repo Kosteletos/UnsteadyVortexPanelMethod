@@ -22,6 +22,7 @@ function streamfunctionPlotting(alpha, pos, gam, xyPanel, xyBoundVortex,uv_vec, 
     %psi = ym;
     psi = zeros([nx,ny]);
     
+    % psi due to bound vorticity
    for i = 1:np
        xV = xyBoundVortex(i,1);
        yV = xyBoundVortex(i,2);
@@ -29,19 +30,21 @@ function streamfunctionPlotting(alpha, pos, gam, xyPanel, xyBoundVortex,uv_vec, 
        psi = psi - (gam(i)/(2*pi))*log(r);
    end
    
+   % psi due to free stream vortices
    inputSize = size(xygFSVortex_rel);
    for i = 1:inputSize(1)
        xV = xygFSVortex_rel(i,1);
        yV = xygFSVortex_rel(i,2);
+       gam_fsv = xygFSVortex_rel(i,3);
        r = sqrt((xm-xV).^2 + (ym-yV).^2);  
-       psi = psi - (gam(i)/(2*pi))*log(r);
+       psi = psi - (gam_fsv/(2*pi))*log(r);
    end
 
     
     %c = -5:0.04:5;
     linkdata on
     figure('Name','streamlines');
-    %contour(xm,ym,psi,50,'b')
+    contour(xm,ym,psi,50,'b')
     axis equal
     hold on
     

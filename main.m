@@ -3,8 +3,8 @@ clear all
 addpath(genpath(pwd))
 
 np = 100; % Number of panels
-t = 2; % Simulation time [s]
-dt = 0.05; % Time step [s]
+t = 0.5; % Simulation time [s]
+dt = 0.01; % Time step [s]
 
 xygFSVortex_rel = []; %Initial Free stream vortices
 totalBoundCirc = 0;
@@ -35,7 +35,7 @@ for tc = 0:tn
     %panelPosPlotting(xyPanel, xyCollocation, xyBoundVortex);
     
     %  Assemble the rhs of the equation for the potential flow calculation
-    b = buildRHS(normal_rel, xyCollocation_rel, xyCollocation, normal, np, pos, vel, alphaDot, alpha, xygFSVortex_rel, totalBoundCirc);
+    b = buildRHS(normal_rel, xyCollocation_rel, xyCollocation, normal, np, pos, -vel, alphaDot, alpha, xygFSVortex_rel, totalBoundCirc);
 
     % Solve for surface vortex sheet strength
     gam = A\b; 

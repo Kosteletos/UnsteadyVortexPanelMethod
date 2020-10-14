@@ -10,7 +10,7 @@ b = zeros([np+1,1]);
     
     uvKinVel = uvKinVel - (inerToRel*vel.').';
     uvKinRot(:,2) = alphaDot*xyCollocation_rel(:,1);
-    uvKinematics = uvKinVel - uvKinRot;
+    uvKinematics = uvKinVel + uvKinRot;
     
     % velocity due to wake 
     [noFreeVortices,~] = size(xygFSVortex_rel);
@@ -24,12 +24,14 @@ b = zeros([np+1,1]);
     
     uv = uvFSVortex + uvKinematics;
 
-    b(1:np) = uv(:,1).*normal_rel(1) + uv(:,2).*normal_rel(2);
-    if noFreeVortices > 0
-        b(np+1) = -sum(xygFSVortex_rel(:,3));
-    else
-        b(np+1) = 0;
-    end
+    b(1:np) = -uv(:,1).*normal_rel(1) - uv(:,2).*normal_rel(2);
+     
+    b(np+1) = totalBoundCirc;
+%     if noFreeVortices > 0
+%         b(np+1) = -sum(xygFSVortex_rel(:,3));
+%     else
+%         b(np+1) = 0;
+%     end
 
 % for i = 1:np
 %     
