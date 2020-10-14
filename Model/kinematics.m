@@ -2,15 +2,21 @@ function [pos, vel, alpha, alphaDot] = kinematics(t)
 %Defines the movement of the plate 
 
 %position, velocity and rotation of moving ref frame
-vel = [-1,0]; % e.g. moving to the left at constant speed => [-1,0]
-pos = [vel(1)*t,vel(2)*t];
+vel = [-1,0];
+pos = vel*t;
+
+
+%accel = [0, 0];
+%vel = accel*t; % e.g. moving to the left at constant speed => [-1,0]
+%pos = (vel*t^2)/2;
 
 omega = pi;
-alpha = sin(omega*t);
-alphaDot = omega*cos(omega*t);
+alpha = 0.5*sin(omega*t);
+alphaDot = 0.5*omega*cos(omega*t);
 
-%alphaDot = 1.5;
-%alpha = alphaDot * t;
+%alphaDotDot = 1;
+%alphaDot = alphaDotDot*t;
+%alpha = alphaDot * t^2 / 2;
 
 %alphaDot = 0;
 %alpha = pi/4;

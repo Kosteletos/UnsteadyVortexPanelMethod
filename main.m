@@ -3,8 +3,8 @@ clear all
 addpath(genpath(pwd))
 
 np = 50; % Number of panels
-t = 0.2; % Simulation time [s]
-dt = 0.01; % Time step [s]
+t = 5; % Simulation time [s]
+dt = 0.02; % Time step [s]
 
 xygFSVortex_rel = []; %Initial Free stream vortices
 totalBoundCirc = 0;
@@ -39,14 +39,14 @@ for tc = 0:tn
     % Calculate bound circulation
     totalBoundCirc = totalBoundCirculation(gam, np);
 
-    %streamfunctionPlotting(alpha, pos, gam, xyPanel, xyBoundVortex, uv_vec, xygFSVortex_rel, xyCollocation, alpha, np);
+    %streamfunctionPlotting(alpha, pos, vel, gam, xyPanel, xyBoundVortex, uv_vec, xygFSVortex_rel, xyCollocation, alpha, np, t, dt);
     
     % Trailing edge vortex is released, wake moves with flow
     [xygFSVortex_rel] = biotSavart(dt, np, vel, alpha, alphaDot, xyPanel_rel, xyBoundVortex_rel, gam, xygFSVortex_rel);
 
 end
 
-streamfunctionPlotting(alpha, pos, gam, uv_vec, xygFSVortex_rel, np);
+streamfunctionPlotting(alpha, pos, vel, gam, uv_vec, xygFSVortex_rel, np, t, dt);
 
 
 

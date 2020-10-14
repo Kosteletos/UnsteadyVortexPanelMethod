@@ -1,4 +1,4 @@
-function streamfunctionPlotting(alpha_rad, pos, gam ,uv_vec, xygFSVortex_rel, np)
+function streamfunctionPlotting(alpha_rad, pos, vel, gam ,uv_vec, xygFSVortex_rel, np, t, dt)
 
     xmin =-1.5;
     xmax =1.5;
@@ -65,6 +65,6 @@ function streamfunctionPlotting(alpha_rad, pos, gam ,uv_vec, xygFSVortex_rel, np
     xlabel('x')
     ylabel('y')
     set(gca,'Fontn','Times','FontSize',10,'linewidth',1)
-    title(strcat('alpha (deg) =',num2str(alpha_rad*180/pi), ' test!!!'));
+    title(strcat('alpha (deg) = ',num2str(alpha_rad*180/pi,3), ';  V = [', num2str(vel), '];  t = ', num2str(t), ';  dt = ', num2str(dt), ';  Np = ', num2str(np)));
     
 end

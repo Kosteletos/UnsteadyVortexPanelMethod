@@ -9,7 +9,13 @@ xp = linspace(position(1,1), position(2,1),np+1);
 yp = linspace(position(1,2), position(2,2),np+1);
 xyPanel = [xp.', yp.'];
 
-xyBoundVortex_rel(end,:) = xyPanel_rel(end,:)+ xyEndPanelPrev-xyPanel(end,:);
+% Transform from inertial frame to rel frame
+inerToRel = [cos(alpha), -sin(alpha); sin(alpha), cos(alpha)]; % inertial frame to relative frame
+
+dxyEndPanel_iner = xyEndPanelPrev-xyPanel(end,:);
+dxyEndPanel_rel = (inerToRel*dxyEndPanel_iner.').';
+
+xyBoundVortex_rel(end,:) = xyPanel_rel(end,:)+ dxyEndPanel_rel;
 
 for i = 1:np
     uv = inducedVelocity(1,xyCollocation_rel(i,:),xyBoundVortex_rel(np+1,:));
