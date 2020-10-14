@@ -3,7 +3,7 @@ function [A, xyBoundVortex_rel, xyPanel] = updateLHS(xyPanel, alpha, pos, np, no
 
 xyEndPanelPrev = xyPanel(end,:);
 
-position = [-0.5*cos(alpha) - pos(1), 0.5*sin(alpha) - pos(2) ; 0.5*cos(alpha) - pos(1), -0.5*sin(alpha) - pos(2)]; %xy_start ; xy_end
+position = [-0.5*cos(alpha) + pos(1), 0.5*sin(alpha) + pos(2) ; 0.5*cos(alpha) + pos(1), -0.5*sin(alpha) + pos(2)]; %xy_start ; xy_end
 
 xp = linspace(position(1,1), position(2,1),np+1);
 yp = linspace(position(1,2), position(2,2),np+1);

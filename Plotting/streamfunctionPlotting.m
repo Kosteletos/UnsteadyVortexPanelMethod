@@ -1,4 +1,4 @@
-function streamfunctionPlotting(alpha, pos, gam, xyPanel, xyBoundVortex,uv_vec, xygFSVortex_rel, xyCollocation, alpha_rad, np)
+function streamfunctionPlotting(alpha_rad, pos, gam ,uv_vec, xygFSVortex_rel, np)
 
     xmin =-1.5;
     xmax =1.5;
@@ -11,9 +11,11 @@ function streamfunctionPlotting(alpha, pos, gam, xyPanel, xyBoundVortex,uv_vec, 
     y = ymin:((ymax-ymin)/(ny-1)):ymax;
     [ym,xm]=meshgrid(y,x);
 
- 
+    
+    [xyPanel, xyCollocation, xyBoundVortex, ~] = makePanels(alpha_rad, pos, np);
+    
     %Rel frame to inertial frame transform
-    inerToRel = [cos(alpha), sin(alpha); -sin(alpha), cos(alpha)]; % inertial frame to relative frame
+    inerToRel = [cos(alpha_rad), sin(alpha_rad); -sin(alpha_rad), cos(alpha_rad)]; % inertial frame to relative frame
     
     if size(xygFSVortex_rel) ~= 0 
         xygFSVortex_rel(:,1:2) = (inerToRel*xygFSVortex_rel(:,1:2).').' + pos;
@@ -44,11 +46,11 @@ function streamfunctionPlotting(alpha, pos, gam, xyPanel, xyBoundVortex,uv_vec, 
     %c = -5:0.04:5;
     linkdata on
     figure('Name','streamlines');
-    contour(xm,ym,psi,50,'b')
+    %contour(xm,ym,psi,50,'b')
     axis equal
     hold on
     
-    quiver(xyCollocation(:,1),xyCollocation(:,2),uv_vec(:,1),uv_vec(:,2) );
+    %quiver(xyCollocation(:,1),xyCollocation(:,2),uv_vec(:,1),uv_vec(:,2) );
     
     plot(xyPanel(:,1),xyPanel(:,2),'k','linewidth',2);
     if size(xygFSVortex_rel) ~= 0
@@ -56,13 +58,13 @@ function streamfunctionPlotting(alpha, pos, gam, xyPanel, xyBoundVortex,uv_vec, 
         noVortices = noVortices(1);
         %plot(xygFSVortex_rel(1:noVortices/2,1), xygFSVortex_rel(1:noVortices/2,2), '-o');
         %plot(xygFSVortex_rel(noVortices/2+1:noVortices,1), xygFSVortex_rel(noVortices/2+1:noVortices,2), '-o');
-        %scatter(xygFSVortex_rel(:,1), xygFSVortex_rel(:,2));
-        plot(xygFSVortex_rel(:,1), xygFSVortex_rel(:,2), 'linewidth', 2);
+        scatter(xygFSVortex_rel(:,1), xygFSVortex_rel(:,2),[], xygFSVortex_rel(:,3)*10, 'x', 'linewidth',2);
+        %plot(xygFSVortex_rel(:,1), xygFSVortex_rel(:,2), 'linewidth', 2);
     end
     hold off 
     xlabel('x')
     ylabel('y')
     set(gca,'Fontn','Times','FontSize',10,'linewidth',1)
-    title(strcat('Streamlines at alpha (deg) =',num2str(alpha_rad*180/pi)));
+    title(strcat('alpha (deg) =',num2str(alpha_rad*180/pi), ' test!!!'));
     
 end
