@@ -57,7 +57,7 @@ function streamfunctionPlotting(alpha, pos, gam, xyPanel, xyBoundVortex,uv_vec, 
         %plot(xygFSVortex_rel(1:noVortices/2,1), xygFSVortex_rel(1:noVortices/2,2), '-o');
         %plot(xygFSVortex_rel(noVortices/2+1:noVortices,1), xygFSVortex_rel(noVortices/2+1:noVortices,2), '-o');
         %scatter(xygFSVortex_rel(:,1), xygFSVortex_rel(:,2));
-        plot(xygFSVortex_rel(:,1), xygFSVortex_rel(:,2), '-o');
+        plot(xygFSVortex_rel(:,1), xygFSVortex_rel(:,2), 'linewidth', 2);
     end
     hold off 
     xlabel('x')

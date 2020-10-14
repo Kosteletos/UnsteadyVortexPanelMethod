@@ -5,11 +5,11 @@ function [pos, vel, alpha, alphaDot] = kinematics(t)
 vel = [1,0]; % e.g. moving to the left at constant speed => [1,0]
 pos = [vel(1)*t,vel(2)*t];
 
-%omega = 1;
+%omega = pi;
 %alpha = sin(omega*t);
 %alphaDot = omega*cos(omega*t);
 
-%alphaDot = 1;
+%alphaDot = 1.5;
 %alpha = alphaDot * t;
 
 alphaDot = 0;

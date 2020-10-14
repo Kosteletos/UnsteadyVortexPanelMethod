@@ -1,6 +1,6 @@
 function [xyPanel, xyCollocation, xyBoundVortex, normal] = makePanels(alpha, pos, np)
 
-position = [-0.5*cos(alpha) + pos(1), 0.5*sin(alpha) + pos(2) ; 0.5*cos(alpha) + pos(1), -0.5*sin(alpha) + pos(2)]; %xy_start ; xy_end
+position = [-0.5*cos(alpha) - pos(1), 0.5*sin(alpha) - pos(2) ; 0.5*cos(alpha) - pos(1), -0.5*sin(alpha) - pos(2)]; %xy_start ; xy_end
 
 normal = [sin(alpha), cos(alpha)];
 
@@ -20,7 +20,7 @@ xyCollocation = [xc.', yc.'];
 %Bound Vortex Positions
 xv = linspace(position(1,1) + xPanLength/4, position(2,1) - 3*xPanLength/4, np);
 yv = linspace(position(1,2) + yPanLength/4, position(2,2) - 3*yPanLength/4, np);
-xv(np+1) = position(2,1); % Not necessarily true <- should it go beyond TE?
+xv(np+1) = position(2,1); % Not true, but a good default point
 yv(np+1) = position(2,2); % 
 
 xyBoundVortex = [xv.', yv.'];

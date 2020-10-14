@@ -3,15 +3,15 @@ clear all
 addpath(genpath(pwd))
 
 np = 100; % Number of panels
-t = 0.5; % Simulation time [s]
-dt = 0.01; % Time step [s]
+t = 1; % Simulation time [s]
+dt = 0.005; % Time step [s]
 
 xygFSVortex_rel = []; %Initial Free stream vortices
 totalBoundCirc = 0;
 
 % Assemble lhs of the equation in relative coords (i.e doesn't change)
 [xyPanel_rel, xyCollocation_rel, xyBoundVortex_rel, normal_rel] = makePanels(0, [0,0], np);
-% A = buildLHS(xyCollocation_rel, xyBoundVortex_rel, normal_rel, np);
+A = buildLHS(xyCollocation_rel, xyBoundVortex_rel, normal_rel, np);
 
 tn = t/dt;
 for tc = 0:tn
@@ -19,27 +19,20 @@ for tc = 0:tn
     
     [pos, vel, alpha, alphaDot] = kinematics(t);
 
-    exists = exist('xyPanel', 'var');
-    if exists == 1 
-        xyPanelPrev = xyPanel;
+    if exist('xyPanel', 'var') 
+        [A, xyBoundVortex_rel, xyPanel] = updateLHS(xyPanel, alpha, pos, np, normal_rel, xyBoundVortex_rel, xyCollocation_rel, xyPanel_rel, A);
     end
-    [xyPanel, xyCollocation, xyBoundVortex, normal] = makePanels(alpha, -pos, np);
-    if exists == 1
-        xyBoundVortex_rel(end,:) = xyPanel_rel(end,:)+ xyPanelPrev(end,:)-xyPanel(end,:);
-    end
-    A = buildLHS(xyCollocation_rel, xyBoundVortex_rel, normal_rel, np);
 
-
-    
     % Panel postion plotting Tool
     %panelPosPlotting(xyPanel, xyCollocation, xyBoundVortex);
     
     %  Assemble the rhs of the equation for the potential flow calculation
-    b = buildRHS(normal_rel, xyCollocation_rel, xyCollocation, normal, np, pos, -vel, alphaDot, alpha, xygFSVortex_rel, totalBoundCirc);
+    b = buildRHS(normal_rel, xyCollocation_rel, np, -vel, alphaDot, alpha, xygFSVortex_rel, totalBoundCirc);
 
     % Solve for surface vortex sheet strength
     gam = A\b; 
     
+    [xyPanel, xyCollocation, xyBoundVortex, normal] = makePanels(alpha, pos, np);
     uv_vec = testUV(xyCollocation, xyBoundVortex, np, gam);
     
     % Calculate bound circulation
@@ -52,7 +45,7 @@ for tc = 0:tn
     [xygFSVortex_rel] = biotSavart(dt, np, vel, alpha, alphaDot, xyPanel_rel, xyBoundVortex_rel, gam, xygFSVortex_rel);
 
 end
-
+[xyPanel, xyCollocation, xyBoundVortex, normal] = makePanels(alpha, pos, np);
 streamfunctionPlotting(alpha, -pos, gam, xyPanel, xyBoundVortex, uv_vec, xygFSVortex_rel, xyCollocation, alpha, np);
 
 

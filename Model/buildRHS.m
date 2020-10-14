@@ -1,4 +1,4 @@
-function [b] = buildRHS(normal_rel, xyCollocation_rel, xyCollocation, normal, np, pos, vel, alphaDot, alpha, xygFSVortex_rel, totalBoundCirc)
+function [b] = buildRHS(normal_rel, xyCollocation_rel, np, vel, alphaDot, alpha, xygFSVortex_rel, totalBoundCirc)
 %Build RHS of matrix A.gam = b
 b = zeros([np+1,1]);
 
@@ -27,40 +27,6 @@ b = zeros([np+1,1]);
     b(1:np) = -uv(:,1).*normal_rel(1) - uv(:,2).*normal_rel(2);
      
     b(np+1) = totalBoundCirc;
-%     if noFreeVortices > 0
-%         b(np+1) = -sum(xygFSVortex_rel(:,3));
-%     else
-%         b(np+1) = 0;
-%     end
-
-% for i = 1:np
-%     
-% 
-%     
-%     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     
-%     %Velocity due to flat plate kinematics 
-%     r = norm(xyCollocation(i,:) - pos);
-%     if i >= np/2
-%         r = -r;
-%     end
-%     
-%     uvKinematics = vel + alphaDot*r*[sin(alpha), cos(alpha)];
-%     
-%     % Wake induced velocity
-%     [noFreeVortices,~] = size(xygFSVortex);
-%     uvFSVortex = [0,0];
-%     for j = 1:noFreeVortices
-%         gam = xygFSVortex(j,3);
-%         uvFSVortex = inducedVelocity(gam,xyCollocation(i,:), xygFSVortex(j,1:2));
-%     end
-%     
-%     uv = uvFSVortex - uvKinematics;
-%     
-%     b(i) = -dot(uv, normal);
-% end
-% 
-% b(np+1) = totalBoundCirc;
 
 end
 
