@@ -6,7 +6,7 @@ function [xygFSVortex_rel] = biotSavart(dt, np, vel, alpha, alphaDot, xyPanel_re
 xygFSVortex_rel = [xygFSVortex_rel; xyBoundVortex_rel(end,1) ,xyBoundVortex_rel(end,2), gam(end)];
 
 % LE Vortex release
-%xygFSVortex_rel = [xyPanel_rel(1,1), xyPanel_rel(1,2), 0.5*gam(1) ; xygFSVortex_rel];
+xygFSVortex_rel = [xyBoundVortex_rel(1,1), xyBoundVortex_rel(1,2), gam(1) ; xygFSVortex_rel];
 
 
 inputSize = size(xygFSVortex_rel);

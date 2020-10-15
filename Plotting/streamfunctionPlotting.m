@@ -43,8 +43,6 @@ function streamfunctionPlotting(alpha_rad, pos, vel, gam ,uv_vec, xygFSVortex_re
    end
 
     
-    %c = -5:0.04:5;
-    linkdata on
     figure('Name','streamlines');
     %contour(xm,ym,psi,50,'b')
     axis equal

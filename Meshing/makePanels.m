@@ -18,10 +18,12 @@ yc = linspace(position(1,2) + 3*yPanLength/4, position(2,2) - yPanLength/4, np);
 xyCollocation = [xc.', yc.'];
 
 %Bound Vortex Positions
-xv = linspace(position(1,1) + xPanLength/4, position(2,1) - 3*xPanLength/4, np);
-yv = linspace(position(1,2) + yPanLength/4, position(2,2) - 3*yPanLength/4, np);
-xv(np+1) = position(2,1); % Not true, but a good default point
-yv(np+1) = position(2,2); % 
+% xv = linspace(position(1,1) + xPanLength/4, position(2,1) - 3*xPanLength/4, np);
+% yv = linspace(position(1,2) + yPanLength/4, position(2,2) - 3*yPanLength/4, np);
+% xv(np+1) = position(2,1); % Not true, but a good default point
+% yv(np+1) = position(2,2); % 
+xv = linspace(position(1,1) + xPanLength/4, position(2,1)+ xPanLength/4, np+1);
+yv = linspace(position(1,2) + yPanLength/4, position(2,2) + yPanLength/4, np+1);
 
 xyBoundVortex = [xv.', yv.'];
 

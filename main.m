@@ -3,8 +3,8 @@ clear all
 addpath(genpath(pwd))
 
 np = 50; % Number of panels
-t = 5; % Simulation time [s]
-dt = 0.02; % Time step [s]
+t = 1; % Simulation time [s]
+dt = 0.01; % Time step [s]
 
 xygFSVortex_rel = []; %Initial Free stream vortices
 totalBoundCirc = 0;
@@ -20,9 +20,9 @@ for tc = 0:tn
     [pos, vel, alpha, alphaDot] = kinematics(t);
 
     if exist('xyPanel', 'var') 
-        [A, xyBoundVortex_rel, xyPanel] = updateLHS(xyPanel, alpha, pos, np, normal_rel, xyBoundVortex_rel, xyCollocation_rel, xyPanel_rel, A);
+        %[A, xyBoundVortex_rel, xyPanel] = updateLHS(xyPanel, alpha, pos, np, normal_rel, xyBoundVortex_rel, xyCollocation_rel, xyPanel_rel, A);
     else
-        [xyPanel, ~, ~, ~] = makePanels(alpha, pos, np);
+        [xyPanel, xyCollocation, xyBoundVortex, ~] = makePanels(alpha, pos, np);
         % Panel postion plotting Tool
         %panelPosPlotting(xyPanel, xyCollocation, xyBoundVortex);
     end
@@ -43,6 +43,7 @@ for tc = 0:tn
     
     % Trailing edge vortex is released, wake moves with flow
     [xygFSVortex_rel] = biotSavart(dt, np, vel, alpha, alphaDot, xyPanel_rel, xyBoundVortex_rel, gam, xygFSVortex_rel);
+    
 
 end
 
