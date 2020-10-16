@@ -6,13 +6,13 @@ vel = [-1,0];
 pos = vel*t;
 
 
-%accel = [0, 0];
+%accel = [-1, 0];
 %vel = accel*t; % e.g. moving to the left at constant speed => [-1,0]
 %pos = (vel*t^2)/2;
 
-% omega = pi;
-% alpha = 0.5*sin(omega*t);
-% alphaDot = 0.5*omega*cos(omega*t);
+%  omega = pi;
+%  alpha = 0.5*sin(omega*t);
+%  alphaDot = 0.5*omega*cos(omega*t);
 
 % alphaDotDot = 1;
 % alphaDot = alphaDotDot*t;

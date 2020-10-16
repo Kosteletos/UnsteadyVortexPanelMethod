@@ -2,9 +2,9 @@ close all
 clear all
 addpath(genpath(pwd))
 
-np = 400; % Number of panels
-t = 0.05; % Simulation time [s]
-dt = 0.0025; % Time step [s]
+np = 50; % Number of panels
+t = 2; % Simulation time [s]
+dt = 0.02; % Time step [s]
 
 xygFSVortex_rel = []; %Initial Free stream vortices
 totalBoundCirc = 0;
@@ -18,6 +18,9 @@ for tc = 0:tn
     t = tc*dt;
     
     [pos, vel, alpha, alphaDot] = kinematics(t);
+
+% For shedding the LE and TE vortex to a point where to LE and TE were at
+% previous time step
 
 %     if exist('xyPanel', 'var') 
 %         [A, xyBoundVortex_rel, xyPanel] = updateLHS(xyPanel, alpha, pos, np, normal_rel, xyBoundVortex_rel, xyCollocation_rel, xyPanel_rel, A);
@@ -36,7 +39,6 @@ for tc = 0:tn
 
     uv_vec = testUV(alpha, pos, np, gam);
     
-    % Calculate bound circulation
     totalBoundCirc = totalBoundCirculation(gam, np);
 
     if tc == tn
