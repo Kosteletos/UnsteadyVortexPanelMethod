@@ -1,9 +1,9 @@
 function streamfunctionPlotting(alpha_rad, pos, vel, gam ,uv_vec, xygFSVortex_rel, np, t, dt)
 
-    xmin =-1.5;
-    xmax =1.5;
-    ymin =-1.5;
-    ymax =1.5;
+    xmin =-2.5;
+    xmax =2.5;
+    ymin =-2.5;
+    ymax =2.5;
     nx = 101;
     ny = 101;   
 
@@ -25,7 +25,7 @@ function streamfunctionPlotting(alpha_rad, pos, vel, gam ,uv_vec, xygFSVortex_re
     psi = zeros([nx,ny]);
     
     % psi due to bound vorticity
-   for i = 1:np
+   for i = 1:np+1
        xV = xyBoundVortex(i,1);
        yV = xyBoundVortex(i,2);
        r = sqrt((xm-xV).^2 + (ym-yV).^2);  

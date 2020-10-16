@@ -4,7 +4,7 @@ function [uv] = inducedVelocity(gam,xy,xyVortex)
 
 dxy = xy-xyVortex;
 r = norm(dxy);
-R = 1e-3 ;
+R = 1.5e-3 ;
 
 % Rankine Vortex
 if r < R

@@ -4,9 +4,11 @@ function [xygFSVortex_rel] = biotSavart(dt, np, vel, alpha, alphaDot, xyPanel_re
 
 %TE Vortex release
 xygFSVortex_rel = [xygFSVortex_rel; xyBoundVortex_rel(end,1) ,xyBoundVortex_rel(end,2), gam(end)];
+%xygFSVortex_rel = [xygFSVortex_rel; 0.50 ,0, gam(end)];
 
 % LE Vortex release
 xygFSVortex_rel = [xyBoundVortex_rel(1,1), xyBoundVortex_rel(1,2), gam(1) ; xygFSVortex_rel];
+%xygFSVortex_rel = [-0.50, 0, gam(1) ; xygFSVortex_rel];
 
 
 inputSize = size(xygFSVortex_rel);
@@ -18,19 +20,23 @@ uvKinVel = zeros(inputSize(1), 2);
 uvKinRot = zeros(inputSize(1), 2);
     
 uvKinVel = uvKinVel + (inerToRel*vel.').';
-uvKinRot(:,1:2) = [-alphaDot*xygFSVortex_rel(:,2),alphaDot*xygFSVortex_rel(:,1)];
+if inputSize(1) >0
+    uvKinRot(:,1:2) = [-alphaDot*xygFSVortex_rel(:,2),alphaDot*xygFSVortex_rel(:,1)];
+end
 uvKinematics = uvKinVel - uvKinRot;
 
-xygFSVortex_rel(:,1:2) = xygFSVortex_rel(:,1:2) - uvKinematics*dt;
+%xygFSVortex_rel(:,1:2) = xygFSVortex_rel(:,1:2) - uvKinematics*dt;
 
 
 for i = 1:inputSize(1)
     uv = [0,0];
     
     % Contribution due to bound vorticity (not including TE Wake)
-    for j = 1:np
+    for j = 2:np
         uv = uv + inducedVelocity(gam(j), xygFSVortex_rel(i,1:2), xyBoundVortex_rel(j,:));
+        %testuv = inducedVelocity(gam(j), xygFSVortex_rel(i,1:2), xyBoundVortex_rel(j,:))
     end     
+    %disp('----------------------------------------------------------------------------------------------------------------------------------------------------------')
 
     % Contribution due wake vortices (including TE wake)
     for k = 1:inputSize(1)
@@ -40,12 +46,16 @@ for i = 1:inputSize(1)
     end
     
     % Distance travelled by vortex
-    dxy = uv * dt;
+    dxy = (uv - uvKinematics(i,:)) * dt;
     
     % New vortex position
     xygFSVortex_rel(i,:) = xygFSVortex_rel(i,:) + [dxy,0];
    
 end
+
+
+
+
 
 
 end

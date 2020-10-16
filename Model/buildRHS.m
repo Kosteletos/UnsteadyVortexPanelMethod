@@ -22,7 +22,7 @@ b = zeros([np+1,1]);
         end
     end
     
-    uv = uvFSVortex + uvKinematics;
+    uv = uvFSVortex(1:np,:) + uvKinematics;
 
     b(1:np) = -uv(:,1).*normal_rel(1) - uv(:,2).*normal_rel(2);
      

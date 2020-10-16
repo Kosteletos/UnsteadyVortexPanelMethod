@@ -19,7 +19,7 @@ pos = vel*t;
 % alpha = alphaDotDot * t^2 / 2;
 
 alphaDot = 0;
-alpha = pi/4;
+alpha = pi/2;
 
 end
 

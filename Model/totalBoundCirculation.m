@@ -3,7 +3,7 @@ function [boundCirc] = totalBoundCirculation(gam, np)
 
 boundCirc = 0;
 
-for i = 1:np
+for i = 2:np
     boundCirc = boundCirc + gam(i);
 end
 
