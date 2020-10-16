@@ -1,13 +1,22 @@
-function [NEWxygFSVortex_rel] = biotSavart(dt, np, vel, alpha, alphaDot, xyPanel_rel, xyBoundVortex_rel, gam, xygFSVortex_rel)
+function [NEWxygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel, alpha, alphaDot, xyBoundVortex_rel, gam, xygFSVortex_rel)
 % Vortex transport of existing vortices and movement of LE and TE
 % vortices into free stream
 
 %TE Vortex release
-xygFSVortex_rel = [xygFSVortex_rel; xyBoundVortex_rel(end,1) ,xyBoundVortex_rel(end,2), gam(end)];
+if TEVortex == 1
+    xygFSVortex_rel = [xygFSVortex_rel; xyBoundVortex_rel(end,1) ,xyBoundVortex_rel(end,2), gam(end)];
+    endPoint = np;
+else
+    endPoint = np+1;
+end
 
 % LE Vortex release
-xygFSVortex_rel = [xyBoundVortex_rel(1,1), xyBoundVortex_rel(1,2), gam(1) ; xygFSVortex_rel];
-
+if LEVortex ==1 
+    xygFSVortex_rel = [xyBoundVortex_rel(1,1), xyBoundVortex_rel(1,2), gam(1) ; xygFSVortex_rel];
+    startPoint = 2;
+else
+    startPoint = 1;
+end
 
 inputSize = size(xygFSVortex_rel);
 NEWxygFSVortex_rel = zeros(inputSize);
@@ -26,9 +35,9 @@ uvKinematics = uvKinVel - uvKinRot;
 
 for i = 1:inputSize(1)
     
-    % Contribution due to bound vorticity (not including TE Wake)
+    % Contribution due to bound vorticity (not including Wake)
     uvBoundVorticity = [0,0];
-    for j = 2:np
+    for j = startPoint:endPoint
         uvBoundVorticity = uvBoundVorticity + inducedVelocity(gam(j), xygFSVortex_rel(i,1:2), xyBoundVortex_rel(j,:));
     end     
 

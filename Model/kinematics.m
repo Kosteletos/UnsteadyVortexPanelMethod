@@ -6,9 +6,9 @@ vel = [-1,0];
 pos = vel*t;
 
 
-%accel = [-1, 0];
-%vel = accel*t; % e.g. moving to the left at constant speed => [-1,0]
-%pos = (vel*t^2)/2;
+% accel = [-1, 0];
+% vel = accel*t; % e.g. moving to the left at constant speed => [-1,0]
+% pos = (vel*t^2)/2;
 
 %  omega = pi;
 %  alpha = 0.5*sin(omega*t);
@@ -19,7 +19,7 @@ pos = vel*t;
 % alpha = alphaDotDot * t^2 / 2;
 
 alphaDot = 0;
-alpha = pi/2;
+alpha = pi/8;
 
 end
 
