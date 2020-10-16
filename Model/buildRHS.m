@@ -15,10 +15,16 @@ b = zeros([np+1,1]);
     % velocity due to wake 
     [noFreeVortices,~] = size(xygFSVortex_rel);
     uvFSVortex = zeros(np,2);
-    for i = 1:np
-        for j = 1:noFreeVortices
-            gam = xygFSVortex_rel(j,3);
-            uvFSVortex(i,:) = uvFSVortex(i,:) + inducedVelocity(gam,xyCollocation_rel(i,:), xygFSVortex_rel(j,1:2)); 
+%     for i = 1:np
+%         for j = 1:noFreeVortices
+%             gam = xygFSVortex_rel(j,3);
+%             uvFSVortex(i,:) = uvFSVortex(i,:) + inducedVelocity(gam,xyCollocation_rel(i,:), xygFSVortex_rel(j,1:2)); 
+%         end
+%     end
+    if noFreeVortices ~= 0 
+        for i = 1:np
+            gam = xygFSVortex_rel(:,3);
+            uvFSVortex(i,:) = uvFSVortex(i,:) + sum(inducedVelocity(gam,xyCollocation_rel(i,:), xygFSVortex_rel(:,1:2)));   
         end
     end
     

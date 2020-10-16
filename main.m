@@ -53,8 +53,9 @@ for tc = 0:tn
         plotForces(lift, lift, dt);
         streamfunctionPlotting(alpha, pos, vel, gam, uv_vec, xygFSVortex_rel, np, t, dt);
     end
-    %streamfunctionPlotting(alpha, pos, vel, gam, uv_vec, xygFSVortex_rel, np, t, dt);
     
+    %streamfunctionPlotting(alpha, pos, vel, gam, uv_vec, xygFSVortex_rel, np, t, dt);
+        
     % Trailing edge vortex is released, wake moves with flow
     [xygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel, alpha, alphaDot, xyBoundVortex_rel, gam, xygFSVortex_rel);
     
