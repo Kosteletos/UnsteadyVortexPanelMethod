@@ -1,3 +1,5 @@
+load
+
 xGrid = PIV.xi;
 yGrid = PIV.yi;
 
