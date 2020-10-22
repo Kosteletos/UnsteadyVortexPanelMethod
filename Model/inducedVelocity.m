@@ -12,8 +12,9 @@ idx = r<R;
 
 uv = gam ./(2.*pi.*r.^2).*([0,1;-1,0]*dxy.').'; 
 
-if idx ~= 0 
-    uv(idx,1:2) = gam.*r./(2*pi*R^3).*([0,1;-1,0]*dxy.').';
+try
+    uv(idx,:) = gam(idx,:).*r(idx,:)./(2*pi*R^3).*([0,1;-1,0]*dxy(idx,:).').';
+catch
 end
 
 end

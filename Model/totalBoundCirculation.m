@@ -18,7 +18,7 @@ end
 
 boundCirc = 0;
 
-for i = startPoint:endPoint
+parfor i = startPoint:endPoint
     boundCirc = boundCirc + gam(i);
 end
 

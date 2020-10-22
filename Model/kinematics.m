@@ -23,7 +23,7 @@ if optimisationFlag == 0
     %alpha = pi/4 + 0.035;
     alpha = 0.270;
 else 
-    alpha = alphaPrev + deltaLift*0.001;
+    alpha = alphaPrev + deltaLift*0.01;
     alphaDot = (alpha - alpha0)/dt;
 end
 end
