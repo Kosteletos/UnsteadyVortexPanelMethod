@@ -1,6 +1,6 @@
-function [xyPanel, xyCollocation, xyBoundVortex, normal] = makePanels(alpha, pos, np)
+function [xyPanel, xyCollocation, xyBoundVortex, normal] = makePanels(alpha, pos, np, panelLength)
 
-position = [-0.5*cos(alpha) + pos(1), 0.5*sin(alpha) + pos(2) ; 0.5*cos(alpha) + pos(1), -0.5*sin(alpha) + pos(2)]; %xy_start ; xy_end
+position = [-panelLength/2*cos(alpha) + pos(1), panelLength/2*sin(alpha) + pos(2) ; panelLength/2*cos(alpha) + pos(1), -panelLength/2*sin(alpha) + pos(2)]; %xy_start ; xy_end
 
 normal = [sin(alpha), cos(alpha)];
 

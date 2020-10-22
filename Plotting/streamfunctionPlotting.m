@@ -1,4 +1,4 @@
-function streamfunctionPlotting(alpha_rad, pos, vel, gam ,uv_vec, xygFSVortex_rel, np, t, dt)
+function streamfunctionPlotting(alpha_rad, pos, vel, gam ,uv_vec, xygFSVortex_rel, np, t, dt, panelLength)
 
     xmin =-2.5;
     xmax =2.5;
@@ -12,7 +12,7 @@ function streamfunctionPlotting(alpha_rad, pos, vel, gam ,uv_vec, xygFSVortex_re
     [ym,xm]=meshgrid(y,x);
 
     
-    [xyPanel, xyCollocation, xyBoundVortex, ~] = makePanels(alpha_rad, pos, np);
+    [xyPanel, xyCollocation, xyBoundVortex, ~] = makePanels(alpha_rad, pos, np, panelLength);
     
     %Rel frame to inertial frame transform
     inerToRel = [cos(alpha_rad), sin(alpha_rad); -sin(alpha_rad), cos(alpha_rad)]; % inertial frame to relative frame

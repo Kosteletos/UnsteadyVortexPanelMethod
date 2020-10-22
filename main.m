@@ -2,16 +2,17 @@ close all
 clear all
 addpath(genpath(pwd))
 
-np = 200; % Number of panels
-t = 1; % Simulation time [s]
-dt = 0.01; % Time step [s]
+np = 400; % Number of panels
+t = 0.5; % Simulation time [s]
+dt = 0.005; % Time step [s]
+plateLength = 0.12;
 targetLift = 0.3;
 LEVortex = 1; %1 = true, 0 = false 
 TEVortex = 1;
 Optimise = 0;
-Forces = 0;
+solveForces = 1;
 
-tn = t/dt;
+tn = round(t/dt);
 xygFSVortex_rel = []; %Initial Free stream vortices
 totalBoundCirc = 0;
 Ix = 0; Iy = 0;
@@ -23,7 +24,7 @@ lift = zeros(tn+1,1);
 drag = zeros(tn+1,1);
 
 % Assemble lhs of the equation in relative coords (i.e doesn't change)
-[xyPanel_rel, xyCollocation_rel, xyBoundVortex_rel, normal_rel] = makePanels(0, [0,0], np);
+[xyPanel_rel, xyCollocation_rel, xyBoundVortex_rel, normal_rel] = makePanels(0, [0,0], np, plateLength);
 A = buildLHS(xyCollocation_rel, xyBoundVortex_rel, normal_rel, np);
 
 
@@ -44,7 +45,7 @@ while tc <= tn
 %     if exist('xyPanel', 'var') 
 %         [A, xyBoundVortex_rel, xyPanel] = updateLHS(xyPanel, alpha, pos, np, normal_rel, xyBoundVortex_rel, xyCollocation_rel, xyPanel_rel, A);
 %     else
-%         [xyPanel, xyCollocation, xyBoundVortex, ~] = makePanels(alpha, pos, np);
+%         [xyPanel, xyCollocation, xyBoundVortex, ~] = makePanels(alpha, pos, np, panelLength);
 % %         Panel postion plotting Tool
 % %         panelPosPlotting(xyPanel, xyCollocation, xyBoundVortex);
 %     end
@@ -56,11 +57,11 @@ while tc <= tn
     gam = A\b; 
     
 
-    uv_vec = testUV(alpha, pos, np, gam);
+    uv_vec = testUV(alpha, pos, np, gam, plateLength);
     
     totalBoundCirc = totalBoundCirculation(LEVortex, TEVortex, gam, np);
     
-    if Forces == 1
+    if solveForces == 1
         if iterationCounter == 0
             Ix0 = Ix;
             Iy0 = Iy;
@@ -76,13 +77,13 @@ while tc <= tn
     end
     
     if tc == tn % || optimisationFlag ==1
-        if Forces == 1
+        if solveForces == 1
             plotForces(lift, lift, dt);
         end
-        streamfunctionPlotting(alpha, pos, vel, gam, uv_vec, xygFSVortex_rel, np, t, dt);
+        streamfunctionPlotting(alpha, pos, vel, gam, uv_vec, xygFSVortex_rel, np, t, dt, panelLength);
     end
     
-    %streamfunctionPlotting(alpha, pos, vel, gam, uv_vec, xygFSVortex_rel, np, t, dt);
+    %streamfunctionPlotting(alpha, pos, vel, gam, uv_vec, xygFSVortex_rel, np, t, dt, panelLength);
         
     % Trailing edge vortex is released, wake moves with flow
     [xygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel, alpha, alphaDot, xyBoundVortex_rel, gam, xygFSVortex_rel);

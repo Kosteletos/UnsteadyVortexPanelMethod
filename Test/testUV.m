@@ -1,5 +1,5 @@
-function [testUV] = testUV(alpha, pos, np, gam)
-[~, xyCollocation, xyBoundVortex, ~] = makePanels(alpha, pos, np);
+function [testUV] = testUV(alpha, pos, np, gam, panelLength)
+[~, xyCollocation, xyBoundVortex, ~] = makePanels(alpha, pos, np, panelLength);
 testUV = zeros(np,2);
 
 for i = 1:np

@@ -1,6 +1,6 @@
 function [Lift, Drag, Ix, Iy] = Forces(dt, alpha_rad, xygFSVortex_rel, xyBoundVortex_rel, gam, IxPrev, IyPrev)
 
-Ix = 0; Iy = 0; Lift = 0; Drag = 0;
+Ix = 0; Iy = 0;
 
 % Free Stream Vortices
 [noFreeVortices,~] = size(xygFSVortex_rel);
