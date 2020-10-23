@@ -3,20 +3,20 @@ clear all
 addpath(genpath(pwd))
 tic
 np = 400; % Number of panels
-t = 0.3; % Simulation time [s]
+t = 1; % Simulation time [s]
 dt = 0.001; % Time step [s]
 plateLength = 0.12;
-targetLift = 4e-3;
+targetLift = 1.5e-2;
 LEVortex = 1; %1 = true, 0 = false 
 TEVortex = 1;
-Optimise = 0;
+Optimise = 1;
 solveForces = 1;
 
 tn = round(t/dt);
-xygFSVortex_rel = []; %Initial Free stream vortices
+xygFSVortex_rel = [];
 totalBoundCirc = 0;
 Ix = 0; Iy = 0;
-optimisationFlag = 1;
+optimisationFlag = 0;
 deltaLift = 0;
 alpha = zeros(tn+1,1);
 lift = zeros(tn+1,1);
@@ -33,8 +33,11 @@ iterationCounter = 0;
 while tc <= tn
     t = tc*dt;
     
-    [pos, vel, alpha(tc+1), alphaDot] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc));
-
+    if iterationCounter == 0
+        [pos, vel, alpha(tc+1), alphaDot] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc), alpha(tc));
+    else
+        [pos, vel, alpha(tc+1), alphaDot] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc));
+    end
     
     % For shedding the LE and TE vortex to a point where to LE and TE were at
     % previous time step
@@ -73,22 +76,23 @@ while tc <= tn
         deltaLift = targetLift - lift(tc+1);
     end
     
-    if tc == tn % || optimisationFlag ==1
+    if tc == tn && abs(deltaLift)< 5e-5
         toc
         if solveForces == 1
-            plotForces(lift, lift, dt);
+            plotForces(lift, drag, alpha, dt);
         end
         streamfunctionPlotting(alpha(tc+1), pos, vel, gam, xygFSVortex_rel, np, t, dt, plateLength);
     end
     
     %streamfunctionPlotting(alpha, pos, vel, gam, xygFSVortex_rel, np, t, dt, plateLength);
         
-    % Trailing edge vortex is released, wake moves with flow
-    [xygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel, alpha(tc+1), alphaDot, xyBoundVortex_rel, gam, xygFSVortex_rel);
+
     
     
     iterationCounter = iterationCounter+1;
-    if (abs(deltaLift) < 0.5e-3) || (optimisationFlag == 0)
+    if (abs(deltaLift)< 5e-5) || (optimisationFlag == 0)
+        % Trailing edge vortex is released, wake moves with flow
+        [xygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel, alpha(tc+1), alphaDot, xyBoundVortex_rel, gam, xygFSVortex_rel);
         tc = tc+1;
         iterationCounter = 0;
     end

@@ -6,7 +6,7 @@ function [pos, vel, alpha, alphaDot] = kinematics(t, dt, optimisationFlag, delta
 %pos = vel*t;
 
 
-accel = [-0.8211, 0];
+accel = [-1, 0];
 vel = accel*t; % e.g. moving to the left at constant speed => [-1,0]
 pos = (accel*t^2)/2-[0,0.0005];
 
@@ -21,9 +21,9 @@ pos = (accel*t^2)/2-[0,0.0005];
 if optimisationFlag == 0
     alphaDot = 0;
     %alpha = pi/4 + 0.035;
-    alpha = 0.270;
+    alpha = pi/3;
 else 
-    alpha = alphaPrev + deltaLift*0.01;
+    alpha = alphaPrev + deltaLift*0.05;
     alphaDot = (alpha - alpha0)/dt;
 end
 end
