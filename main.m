@@ -2,22 +2,31 @@ close all
 clear all
 addpath(genpath(pwd))
 tic
-np = 400; % Number of panels
+
+% Simulation Options
+np = 100; % Number of panels
 t = 1; % Simulation time [s]
-dt = 0.001; % Time step [s]
+dt = 0.005; % Time step [s]
 plateLength = 0.12;
 targetLift = 1.5e-2;
-LEVortex = 1; %1 = true, 0 = false 
+LEVortex = 0; %1 = true, 0 = false 
 TEVortex = 1;
-Optimise = 1;
-solveForces = 1;
+Optimise = 0;
+solveForces = 0;
+
+%Plotting options
+
 
 tn = round(t/dt);
+h = figure;
+M(tn) = struct('cdata',[],'colormap',[]);
+[h, M, xm, ym, nx, ny] = preparePlots(h,M);
 xygFSVortex_rel = [];
 totalBoundCirc = 0;
 Ix = 0; Iy = 0;
 optimisationFlag = 0;
 deltaLift = 0;
+alphaDot = zeros(tn+1,1);
 alpha = zeros(tn+1,1);
 lift = zeros(tn+1,1);
 drag = zeros(tn+1,1);
@@ -27,16 +36,16 @@ drag = zeros(tn+1,1);
 A = buildLHS(xyCollocation_rel, xyBoundVortex_rel, normal_rel, np);
 
 
-%for tc = 0:tn %convert to while loop for optimisation, only move to next time when lift is within bounds
+ 
 tc = 1;
 iterationCounter = 0;
 while tc <= tn
     t = tc*dt;
     
     if iterationCounter == 0
-        [pos, vel, alpha(tc+1), alphaDot] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc), alpha(tc));
+        [pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc), alpha(tc));
     else
-        [pos, vel, alpha(tc+1), alphaDot] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc));
+        [pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc));
     end
     
     % For shedding the LE and TE vortex to a point where to LE and TE were at
@@ -51,7 +60,7 @@ while tc <= tn
     %     end
 
     %  Assemble the rhs of the equation for the potential flow calculation
-    b = buildRHS(normal_rel, xyCollocation_rel, np, vel, alphaDot, alpha(tc+1), xygFSVortex_rel, totalBoundCirc);
+    b = buildRHS(normal_rel, xyCollocation_rel, np, vel, alphaDot(tc+1), alpha(tc+1), xygFSVortex_rel, totalBoundCirc);
 
     % Solve for surface vortex sheet strength
     gam = A\b; 
@@ -79,12 +88,12 @@ while tc <= tn
     if tc == tn && abs(deltaLift)< 5e-5
         toc
         if solveForces == 1
-            plotForces(lift, drag, alpha, dt);
+            plotForces(lift, drag, alpha, alphaDot, dt);
         end
-        streamfunctionPlotting(alpha(tc+1), pos, vel, gam, xygFSVortex_rel, np, t, dt, plateLength);
+        [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos, vel, gam, xygFSVortex_rel, np, t, dt, plateLength);
     end
     
-    %streamfunctionPlotting(alpha, pos, vel, gam, xygFSVortex_rel, np, t, dt, plateLength);
+    [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos, vel, gam, xygFSVortex_rel, np, t, dt, plateLength);
         
 
     
@@ -92,7 +101,7 @@ while tc <= tn
     iterationCounter = iterationCounter+1;
     if (abs(deltaLift)< 5e-5) || (optimisationFlag == 0)
         % Trailing edge vortex is released, wake moves with flow
-        [xygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel, alpha(tc+1), alphaDot, xyBoundVortex_rel, gam, xygFSVortex_rel);
+        [xygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel, alpha(tc+1), alphaDot(tc+1), xyBoundVortex_rel, gam, xygFSVortex_rel);
         tc = tc+1;
         iterationCounter = 0;
     end

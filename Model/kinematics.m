@@ -21,9 +21,9 @@ pos = (accel*t^2)/2-[0,0.0005];
 if optimisationFlag == 0
     alphaDot = 0;
     %alpha = pi/4 + 0.035;
-    alpha = pi/3;
+    alpha = pi/8;
 else 
-    alpha = alphaPrev + deltaLift*0.05;
+    alpha = alphaPrev + deltaLift*0.01;
     alphaDot = (alpha - alpha0)/dt;
 end
 end

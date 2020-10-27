@@ -1,15 +1,6 @@
-function streamfunctionPlotting(alpha_rad, pos, vel, gam , xygFSVortex_rel, np, t, dt, panelLength)
+function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel, gam , xygFSVortex_rel, np, t, dt, panelLength)
 
-    xmin =-2.5;
-    xmax =2.5;
-    ymin =-2.5;
-    ymax =2.5;
-    nx = 101;
-    ny = 101;   
 
-    x = xmin:((xmax-xmin)/(nx-1)):xmax;
-    y = ymin:((ymax-ymin)/(ny-1)):ymax;
-    [ym,xm]=meshgrid(y,x);
 
     
     [xyPanel, ~, xyBoundVortex, ~] = makePanels(alpha_rad, pos, np, panelLength);
@@ -43,26 +34,23 @@ function streamfunctionPlotting(alpha_rad, pos, vel, gam , xygFSVortex_rel, np, 
    end
 
     
-    figure('Name','streamlines');
+    %figure('Name','streamlines');
     %contour(xm,ym,psi,50,'b')
-    axis equal
+    cla
     hold on
     
     %quiver(xyCollocation(:,1),xyCollocation(:,2),uv_vec(:,1),uv_vec(:,2) );
     
     plot(xyPanel(:,1),xyPanel(:,2),'k','linewidth',2);
     if size(xygFSVortex_rel) ~= 0
-        noVortices = size(xygFSVortex_rel);
-        noVortices = noVortices(1);
-        %plot(xygFSVortex_rel(1:noVortices/2,1), xygFSVortex_rel(1:noVortices/2,2), '-o');
-        %plot(xygFSVortex_rel(noVortices/2+1:noVortices,1), xygFSVortex_rel(noVortices/2+1:noVortices,2), '-o');
-        scatter(xygFSVortex_rel(:,1), xygFSVortex_rel(:,2),[], xygFSVortex_rel(:,3)*10, 'x', 'linewidth',2);
-        %plot(xygFSVortex_rel(:,1), xygFSVortex_rel(:,2), 'linewidth', 2);
+        pos = xygFSVortex_rel(:,3)>0;
+        scatter(xygFSVortex_rel(pos,1), xygFSVortex_rel(pos,2),[], 'b', 'x', 'linewidth',2);
+        scatter(xygFSVortex_rel(~pos,1), xygFSVortex_rel(~pos,2),[], 'r', 'x', 'linewidth',2);
+
+
     end
     hold off 
-    xlabel('x')
-    ylabel('y')
-    set(gca,'Fontn','Times','FontSize',10,'linewidth',1)
-    title(strcat('alpha (deg) = ',num2str(alpha_rad*180/pi,3), ';  V = [', num2str(vel), '];  t = ', num2str(t), ';  dt = ', num2str(dt), ';  Np = ', num2str(np)));
-    
+    title(strcat('alpha (deg) = ',num2str(alpha_rad*180/pi,3), ';  V = [', num2str(vel(1)),', ',num2str(vel(2)), '];  t = ', num2str(t), ';  dt = ', num2str(dt), ';  Np = ', num2str(np)));
+    drawnow
+    M(round(t/dt)) = getframe;
 end
