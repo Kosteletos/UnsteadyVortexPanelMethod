@@ -33,13 +33,20 @@ if inputSize(1) >0
 end
 uvKinematics = uvKinVel - uvKinRot;
 
-for i = 1:inputSize(1)
+
+gam_sliced = gam(startPoint:endPoint);
+xyBoundVortex_rel_sliced = xyBoundVortex_rel(startPoint:endPoint,:);
+xygFSVortex_rel_positions = xygFSVortex_rel(:,1:2);
+xygFSVortex_rel_gam = xygFSVortex_rel(:,3);
+parfor i = 1:inputSize(1)
     
     %Contribution due to bound vorticity (not including Wake)
-    uvBoundVorticity = sum(inducedVelocity(gam(startPoint:endPoint), xygFSVortex_rel(i,1:2), xyBoundVortex_rel(startPoint:endPoint,:)));
-
+    uvBoundVorticity = sum(inducedVelocity(gam_sliced, xygFSVortex_rel_positions(i,:), xyBoundVortex_rel_sliced));
+    uvBoundVorticityRef(i,:) = uvBoundVorticity;
+    
+    
     % Contribution due wake vortices (including TE wake)
-    uvWakeVorticity =  sum(inducedVelocity(xygFSVortex_rel(:,3), xygFSVortex_rel(i,1:2), xygFSVortex_rel(:,1:2)));
+    uvWakeVorticity =  sum(inducedVelocity(xygFSVortex_rel_gam, xygFSVortex_rel_positions(i,:), xygFSVortex_rel_positions));
     
     % Distance travelled by vortex
     dxy = (uvBoundVorticity + uvWakeVorticity - uvKinematics(i,:)) * dt;
@@ -48,6 +55,7 @@ for i = 1:inputSize(1)
     NEWxygFSVortex_rel(i,:) = xygFSVortex_rel(i,:) + [dxy,0];
 end
 
+    [uv_BoundVorticityTest_x, uv_BoundVorticityTest_y] = inducedVelocityMat(gam_sliced,xygFSVortex_rel_positions,xyBoundVortex_rel_sliced);
 
 
 end
