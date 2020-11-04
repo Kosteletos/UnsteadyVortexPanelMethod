@@ -5,7 +5,7 @@ tic
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Simulation Options
 np = 400; % Number of panels
-t = 0.5; % Simulation time [s]
+t = 0.2; % Simulation time [s]
 dt = 0.001; % Time step [s]
 rho = 1000; % Density [kg/m^3]
 chord = 0.12;
@@ -91,7 +91,7 @@ while tc <= tn
     end
     
     
-    if tc == tn && abs(deltaLift)< 5e-2
+    if (tc == tn && (abs(deltaLift)< 5e-2 || Optimise==0))
         toc
         if solveForces == 1
             plotForces(lift, drag, alpha, alphaDot, dt);
@@ -99,11 +99,13 @@ while tc <= tn
         [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos, vel, gam, xygFSVortex_rel, np, t, dt, chord, Streamlines);
     end    
 
-    disp(['time=',num2str(t),', iteration=',num2str(iterationCounter)]);
+    disp(['time=',num2str(t),', iteration=',num2str(iterationCounter)]); %include time taken for this iteration
   
     iterationCounter = iterationCounter+1;
     if (abs(deltaLift)< 5e-2) || (optimisationFlag == 0 || (optimisationFlag == 2)) %normally 5e-5 
-        %[M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos, vel, gam, xygFSVortex_rel, np, t, dt, chord, Streamlines);
+        if mod(tc,20) == 0
+            %[M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos, vel, gam, xygFSVortex_rel, np, t, dt, chord, Streamlines);
+        end
         % Trailing edge vortex is released, wake moves with flow
         [xygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel, alpha(tc+1), alphaDot(tc+1), xyBoundVortex_rel, gam, xygFSVortex_rel);
         tc = tc+1;

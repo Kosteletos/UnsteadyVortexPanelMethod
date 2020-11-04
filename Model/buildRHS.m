@@ -16,10 +16,9 @@ function [b] = buildRHS(normal_rel, xyCollocation_rel, np, vel, alphaDot, alpha,
     [noFreeVortices,~] = size(xygFSVortex_rel);
     uvFSVortex = zeros(np,2);
 
-    if noFreeVortices ~= 0 
-        for i = 1:np
-            uvFSVortex(i,:) = uvFSVortex(i,:) + sum(inducedVelocity(xygFSVortex_rel(:,3), xyCollocation_rel(i,:), xygFSVortex_rel(:,1:2)));   
-        end
+    if noFreeVortices ~= 0         
+        [uvFSVortex_x, uvFSVortex_y] = inducedVelocityMat(xygFSVortex_rel(:,3),xyCollocation_rel,xygFSVortex_rel(:,1:2));
+        uvFSVortex = [sum(uvFSVortex_x).', sum(uvFSVortex_y).'];
     end
 
     uv = uvFSVortex(1:np,:) + uvKinematics;

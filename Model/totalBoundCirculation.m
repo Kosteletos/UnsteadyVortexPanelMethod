@@ -15,12 +15,7 @@ else
     startPoint = 1;
 end
 
-
-boundCirc = 0;
-
-parfor i = startPoint:endPoint
-    boundCirc = boundCirc + gam(i);
-end
+boundCirc = sum(gam(startPoint:endPoint));
 
 end
 
