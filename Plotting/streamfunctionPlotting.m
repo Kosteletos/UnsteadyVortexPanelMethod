@@ -1,4 +1,4 @@
-function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel, gam , xygFSVortex_rel, np, t, dt, panelLength, Streamlines)
+function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel, gam , xygFSVortex_rel, np, t, dt, panelLength, Streamlines, frames)
 
 
 
@@ -60,5 +60,5 @@ function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel
     hold off 
     title(strcat('alpha (deg) = ',num2str(alpha_rad*180/pi,3), ';  V = [', num2str(vel(1)),', ',num2str(vel(2)), '];  t = ', num2str(t), ';  dt = ', num2str(dt), ';  Np = ', num2str(np)));
 
-    %M(round(t/dt)) = getframe;
+    M(round(t/dt/frames)) = getframe;
 end

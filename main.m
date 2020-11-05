@@ -5,7 +5,7 @@ tic
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Simulation Options
 np = 400; % Number of panels
-t = 0.2; % Simulation time [s]
+t = 2; % Simulation time [s]
 dt = 0.001; % Time step [s]
 rho = 1000; % Density [kg/m^3]
 chord = 0.12;
@@ -13,11 +13,14 @@ targetLift = 8;
 LEVortex = 1; %1 = true, 0 = false 
 TEVortex = 1;
 Optimise = 0;
+stopOptimiseTime = 2; %[s]
 solveForces = 1;
 
 %Plotting options
 Streamlines = 0;
 Vortices = 1;
+frames = 20;
+load("PIVData/PIV-Vel_322_Angle_45_Acc_50") % Load PIV data if needed
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 tn = round(t/dt);
@@ -33,6 +36,7 @@ alphaDot = zeros(tn+1,1);
 alpha = zeros(tn+1,1);
 lift = zeros(tn+1,1);
 drag = zeros(tn+1,1);
+cl = zeros(tn+1,1);
 
 % Assemble lhs of the equation in relative coords (i.e doesn't change)
 [xyPanel_rel, xyCollocation_rel, xyBoundVortex_rel, normal_rel] = makePanels(0, [0,0], np, chord);
@@ -44,7 +48,8 @@ while tc <= tn
     t = tc*dt;
     
     if iterationCounter == 0
-        [pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc), alpha(tc), rho, chord, 0);
+        %[pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc), alpha(tc), rho, chord, 0);
+        [pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematicsFromPIV(t, dt, PIV);
     else
         [pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), rho, chord, iterationCounter);
     end
@@ -74,16 +79,16 @@ while tc <= tn
         if iterationCounter == 0
             Ix0 = Ix;
             Iy0 = Iy;
-            [lift(tc+1), drag(tc+1), Ix, Iy] = Forces(dt, alpha(tc+1), rho, xygFSVortex_rel, xyBoundVortex_rel, gam, Ix, Iy);
+            [lift(tc+1), drag(tc+1), Ix, Iy, cl(tc+1)] = Forces(dt, alpha(tc+1), rho, xygFSVortex_rel, xyBoundVortex_rel, gam, Ix, Iy, vel, chord);
         else
-            [lift(tc+1), drag(tc+1), Ix, Iy] = Forces(dt, alpha(tc+1), rho, xygFSVortex_rel, xyBoundVortex_rel, gam, Ix0, Iy0);
+            [lift(tc+1), drag(tc+1), Ix, Iy, cl(tc+1)] = Forces(dt, alpha(tc+1), rho, xygFSVortex_rel, xyBoundVortex_rel, gam, Ix0, Iy0, vel, chord);
         end
     
         if (lift(tc+1) > targetLift) && (Optimise == 1)
             optimisationFlag = 1;
         end
         
-        if (t > 0.5) && (Optimise==1)
+        if (t > stopOptimiseTime) && (Optimise==1)
            optimisationFlag = 2; 
         end
         
@@ -94,7 +99,7 @@ while tc <= tn
     if (tc == tn && (abs(deltaLift)< 5e-2 || Optimise==0))
         toc
         if solveForces == 1
-            plotForces(lift, drag, alpha, alphaDot, dt);
+            plotForces(lift, drag, cl, alpha, alphaDot, dt);
         end
         [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos, vel, gam, xygFSVortex_rel, np, t, dt, chord, Streamlines);
     end    
@@ -103,8 +108,8 @@ while tc <= tn
   
     iterationCounter = iterationCounter+1;
     if (abs(deltaLift)< 5e-2) || (optimisationFlag == 0 || (optimisationFlag == 2)) %normally 5e-5 
-        if mod(tc,20) == 0
-            %[M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos, vel, gam, xygFSVortex_rel, np, t, dt, chord, Streamlines);
+        if mod(tc,frames) == 0
+            %[M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos, vel, gam, xygFSVortex_rel, np, t, dt, chord, Streamlines, frames);
         end
         % Trailing edge vortex is released, wake moves with flow
         [xygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel, alpha(tc+1), alphaDot(tc+1), xyBoundVortex_rel, gam, xygFSVortex_rel);
