@@ -1,9 +1,9 @@
 load("PIVData/PIV-Vel_322_Angle_45_Acc_50")
 
-lift = PIV.Lift;
-t = PIV.Time;
+PIVlift = PIV.Lift;
+PIVt = PIV.Time - PIV.Time(1);
 
-plot(t,lift)
+plot(PIVt,PIVlift)
 legend("Experimental Lift",'northwest');
 xlabel("Time (s)")
 ylabel("Lift (N)")

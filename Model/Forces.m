@@ -1,25 +1,49 @@
-function [Lift, Drag, Ix, Iy, cl] = Forces(dt, alpha_rad, rho, xygFSVortex_rel, xyBoundVortex_rel, gam, IxPrev, IyPrev, vel, chord)
+function [Lift, Drag, Ix, Iy, Ixf, Iyf, Ixb, Iyb, cl, LiftComponents] = Forces(dt, alpha_rad, rho, xygFSVortex_rel, xyBoundVortex_rel, gam, IxPrev, IyPrev, IxfPrev, IyfPrev, IxbPrev, IybPrev, chord)
 
-Ix = 0; Iy = 0;
+Ixb = 0; Iyb = 0; % bound
+Ixf = 0; Iyf = 0; % free-stream
+
+% Transform into inertial frame
+trans = [sin(alpha_rad), cos(alpha_rad); cos(alpha_rad), sin(alpha_rad)];
 
 % Note vorticity = 2*angular velocity
 
 % Free Stream Vortices
 [noFreeVortices,~] = size(xygFSVortex_rel);
 if noFreeVortices ~= 0
-    Ix = Ix + sum(xygFSVortex_rel(:,2).*xygFSVortex_rel(:,3));
-    Iy = Iy + sum(xygFSVortex_rel(:,1).*xygFSVortex_rel(:,3));
+    Ixf = sum(xygFSVortex_rel(:,2).*xygFSVortex_rel(:,3))/2;
+    Iyf = sum(xygFSVortex_rel(:,1).*xygFSVortex_rel(:,3))/2;
 end
 
+
 % Bound Vorticity
-Ix = Ix + sum(xyBoundVortex_rel(:,2).*gam);
-Iy = Iy + sum(xyBoundVortex_rel(:,1).*gam);
+Ixb = sum(xyBoundVortex_rel(:,2).*gam)/2;
+Iyb = sum(xyBoundVortex_rel(:,1).*gam)/2;
+
+%%
+% Added Mass
+Fxb = -rho*(Ixb - IxbPrev)/dt;
+Fyb = -rho*(Iyb - IybPrev)/dt;
+
+Forceb = trans*[Fxb;Fyb];
+Liftb = Forceb(1);
+% Circulatory
+Fxf = -rho*(Ixf - IxfPrev)/dt;
+Fyf = -rho*(Iyf - IyfPrev)/dt;
+
+Forcef = trans*[Fxf;Fyf];
+Liftf = Forcef(1);
+
+
+LiftComponents = [Liftb, Liftf];
+
+%%
+% Total
+Ix = Ixb + Ixf;
+Iy = Iyb + Iyf;
 
 Fx = -rho*(Ix - IxPrev)/dt;
 Fy = -rho*(Iy - IyPrev)/dt;
-
-% Transform into inertial frame
-trans = [sin(alpha_rad), cos(alpha_rad); cos(alpha_rad), sin(alpha_rad)];
 
 Force = trans*[Fx;Fy];
 Lift = Force(1);

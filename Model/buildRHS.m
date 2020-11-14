@@ -10,7 +10,7 @@ function [b] = buildRHS(normal_rel, xyCollocation_rel, np, vel, alphaDot, alpha,
 
     uvKinVel = uvKinVel - (inerToRel*vel.').';
     uvKinRot(:,2) = alphaDot*xyCollocation_rel(:,1);
-    uvKinematics = uvKinVel + uvKinRot;
+    uvKinematics = (uvKinVel + uvKinRot);
 
     % velocity due to wake 
     [noFreeVortices,~] = size(xygFSVortex_rel);

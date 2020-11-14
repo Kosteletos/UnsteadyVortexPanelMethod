@@ -45,6 +45,10 @@ function [NEWxygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel, alph
     % Distance travelled by vortices
     dxy = (uvBoundVorticity + uvWakeVorticity - uvKinematics) * dt;
     
+    if inputSize(1)==1
+        dxy = dxy(1,:);
+    end
+    
     % New vortex positions & magnitudes
     NEWxygFSVortex_rel = xygFSVortex_rel + [dxy,zeros(inputSize(1),1)];
 end
