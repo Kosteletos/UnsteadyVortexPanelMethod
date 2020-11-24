@@ -1,5 +1,5 @@
-close all
-clear all
+%close all
+%clear all
 addpath(genpath(pwd))
 tic
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -9,11 +9,11 @@ t = 1; % Simulation time [s]
 dt = 0.001; % Time step [s]
 rho = 1000; % Density [kg/m^3]
 chord = 0.12;
-targetLift = 2;
+targetLift = 0;
 LEVortex = 1; %1 = true, 0 = false 
 TEVortex = 1;
-Optimise = 0;
-stopOptimiseTime = 0.7; %[s]
+Optimise = 1;
+stopOptimiseTime = 2; %[s]
 solveForces = 1;
 
 %Plotting options
@@ -36,6 +36,7 @@ optimisationFlag = 0;
 deltaLift = 0;
 alphaDot = zeros(tn+1,1);
 alpha = zeros(tn+1,1);
+%alpha = alphaModel;
 lift = zeros(tn+1,1);
 drag = zeros(tn+1,1);
 cl = zeros(tn+1,1);
@@ -53,11 +54,15 @@ while tc <= tn
     t = tc*dt;
     
     if iterationCounter == 0
-        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc), alpha(tc), rho, chord, pos(tc,:), vel(tc,:));
+        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc), alpha(tc), rho, chord, pos(tc,:), vel(tc,:)); %first alpha should be alpha(tc) for normal mitigation
         %[pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematicsFromPIV(t, PIV);
+    elseif optimisationFlag == 2
+        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), rho, chord, pos(tc,:),vel(tc,:));
+            
     else
         [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), rho, chord, pos(tc,:), [0,0]);
     end
+    
     
     % For shedding the LE and TE vortex to a point where to LE and TE were at
     % previous time step
@@ -90,13 +95,13 @@ while tc <= tn
             [lift(tc+1), drag(tc+1), Ix, Iy, Ixf, Iyf, Ixb, Iyb, cl(tc+1), LiftComponents(tc,:)] = Forces(dt, alpha(tc+1), rho, xygFSVortex_rel, xyBoundVortex_rel, gam, Ix0, Iy0, Ixf0, Iyf0, Ixb0, Iyb0, chord);
         end
     
-        if (lift(tc+1) > targetLift) && (Optimise == 1)
+        %if (lift(tc+1) > targetLift) && (Optimise == 1)
+        if (t>0.5) && (Optimise == 1) && (optimisationFlag ~=2)
             optimisationFlag = 1;
+            targetLift = lift(501);
         end
         
-        if (t > stopOptimiseTime) && (Optimise==1)
-           optimisationFlag = 2; 
-        end
+
         
         deltaLift = targetLift - lift(tc+1);
     end
@@ -113,10 +118,14 @@ while tc <= tn
     disp(['time=',num2str(t),', iteration=',num2str(iterationCounter)]); %include time taken for this iteration
   
     iterationCounter = iterationCounter+1;
-    if (abs(deltaLift)< 1e-2) || (optimisationFlag == 0 || (optimisationFlag == 2)) %normally 5e-5 
+    if (abs(deltaLift)< 1e-2) || (optimisationFlag == 0) %normally 5e-5 
         if mod(tc,frames) == 0
             [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos(tc+1,:), vel(tc+1,:), gam, xygFSVortex_rel, np, t, dt, chord, Streamlines, frames);
         end
+        if (t > stopOptimiseTime) && (Optimise==1)
+           optimisationFlag = 2; 
+        end
+        
         % Trailing edge vortex is released, wake moves with flow
         [xygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel(tc+1,:), alpha(tc+1), alphaDot(tc+1), xyBoundVortex_rel, gam, xygFSVortex_rel);
         tc = tc+1;

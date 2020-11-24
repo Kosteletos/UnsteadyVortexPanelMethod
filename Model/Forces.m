@@ -11,14 +11,14 @@ trans = [sin(alpha_rad), cos(alpha_rad); cos(alpha_rad), sin(alpha_rad)];
 % Free Stream Vortices
 [noFreeVortices,~] = size(xygFSVortex_rel);
 if noFreeVortices ~= 0
-    Ixf = sum(xygFSVortex_rel(:,2).*xygFSVortex_rel(:,3))/2;
-    Iyf = sum(xygFSVortex_rel(:,1).*xygFSVortex_rel(:,3))/2;
+    Ixf = sum(xygFSVortex_rel(:,2).*xygFSVortex_rel(:,3));
+    Iyf = sum(xygFSVortex_rel(:,1).*xygFSVortex_rel(:,3));
 end
 
 
 % Bound Vorticity
-Ixb = sum(xyBoundVortex_rel(:,2).*gam)/2;
-Iyb = sum(xyBoundVortex_rel(:,1).*gam)/2;
+Ixb = sum(xyBoundVortex_rel(:,2).*gam);
+Iyb = sum(xyBoundVortex_rel(:,1).*gam);
 
 %%
 % Added Mass

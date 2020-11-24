@@ -9,20 +9,20 @@ t = 0:dt:(dt*length);
 plot(t(4:length(1)), Lift(4:length(1)),'k');
 ylabel('Lift [N]')
 hold on
-plot(t(4:length(1)), LiftComponents(4:length(1),1),'r');
-plot(t(4:length(1)), LiftComponents(4:length(1),2),'b');
+%plot(t(4:length(1)), LiftComponents(4:length(1),1),'r');
+%plot(t(4:length(1)), LiftComponents(4:length(1),2),'b');
 
-%yyaxis right
-%ylabel('alpha [deg]')
-%alpha = alpha*180/pi;
-%plot(t(4:length(1)), alpha(4:length(1)));
+yyaxis right
+ylabel('alpha [deg]')
+alpha = alpha*180/pi;
+plot(t(4:length(1)), alpha(4:length(1)));
 %plot(t(2:length(1)), cl(2:length(1)));
 %plot(t(2:length(1)), 0.01*alphaDot(2:length(1)));
 %plot((PIV.Time - PIV.Time(1)), -PIV.Lift)
 hold off
-%legend("Lift","alpha") %, "cl", "0.01*alphaDot",'Location','northwest');
+legend("Lift","alpha") %, "cl", "0.01*alphaDot",'Location','northwest');
 %legend("lift", "Experimental Lift")
-legend("lift", "Added-mass", "Circulatory")
+%legend("lift", "Added-mass", "Circulatory")
 xlabel("Time (s)")
 end
 

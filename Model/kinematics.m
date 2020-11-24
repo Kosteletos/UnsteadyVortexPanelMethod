@@ -6,26 +6,37 @@ function [pos, vel, alpha, alphaDot] = kinematics(t, dt, optimisationFlag, delta
 %pos = vel*t;
 
 
-accel = [-0.3, 0]; % e.g. moving to the left at constant acceleration => [-1,0]
+accel = [-0.4, 0]; % e.g. moving to the left at constant acceleration => [-1,0]
 
 if optimisationFlag == 0
     vel = accel*t; 
     pos = (accel*t^2)/2;
     
-    alphaDot = 0;
+    %vel = [-0.4,0];
+    %pos = vel*t;
+    
+    alphaDot = (alphaPrev - alpha0)/dt;
     %alpha = pi/4 + 0.035;
-    alpha = pi/4; 
+    alpha = pi/12; 
 elseif optimisationFlag == 1
     vel = accel*t; 
     pos = (accel*t^2)/2;
     
+    %vel = [-0.4,0] + accel*(t-0.5); 
+    %pos = [-0.4,0]*t + (accel*(t-0.5)^2)/2;
+    
     cl = deltaLift/(0.5*rho*norm(vel)^2*chord);
-    alpha = alphaPrev + cl/(2*pi*100);
+    alpha = alphaPrev + cl/(2*pi*400);
     alphaDot = (alpha - alpha0)/dt;  
 else
-    alpha = alphaPrev;
-    alphaDot = 0;
     pos = pos + vel*dt;
+    accel = [0,0];
+    
+    cl = deltaLift/(0.5*rho*norm(vel)^2*chord);
+    alpha = alphaPrev + cl/(2*pi*400);
+    alphaDot = (alpha - alpha0)/dt;  
+    
+
 end
 
 
