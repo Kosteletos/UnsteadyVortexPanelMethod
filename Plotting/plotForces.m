@@ -4,7 +4,7 @@ function plotForces(Lift, LiftComponents, Drag, cl, alpha, alphaDot, dt)%, PIV)
 length = size(Lift);
 
 t = 0:dt:(dt*length);
-
+figure(2)
 %yyaxis left
 plot(t(4:length(1)), Lift(4:length(1)),'k');
 ylabel('Lift [N]')

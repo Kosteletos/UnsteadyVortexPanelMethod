@@ -15,10 +15,13 @@ function [h,M, xm, ym, nx, ny] = preparePlots(h,M)
     [ym,xm]=meshgrid(y,x);
 
     
+    box off
+    
     xlabel('x')
     ylabel('y')
     set(gca,'Fontn','Times','FontSize',10,'linewidth',1)
     set(gca,'NextPlot','replacechildren');
+    
 
 
 end

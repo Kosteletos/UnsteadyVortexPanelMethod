@@ -1,8 +1,5 @@
-function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel, gam , xygFSVortex_rel, np, t, dt, panelLength, Streamlines, frames)
-
-
-
-    
+function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel, gam , xygFSVortex_rel, np, t, dt, panelLength, Streamlines)
+ 
     [xyPanel, ~, xyBoundVortex, ~] = makePanels(alpha_rad, pos, np, panelLength);
     
     %Rel frame to inertial frame transform
@@ -20,7 +17,6 @@ function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel
     
     if Streamlines == 1
     
-        %psi = ym;
         psi = zeros([nx,ny]);
 
         % psi due to bound vorticity
@@ -49,7 +45,6 @@ function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel
     
     %quiver(xyCollocation(:,1),xyCollocation(:,2),uv_vec(:,1),uv_vec(:,2) );
     
-    plot(xyPanel(:,1),xyPanel(:,2),'k','linewidth',2);
     if size(xygFSVortex_rel) ~= 0
         pos = xygFSVortex_rel(:,3)>0;
         scatter(xygFSVortex_rel(pos,1), xygFSVortex_rel(pos,2),[], 'b', 'x', 'linewidth',1);
@@ -57,8 +52,24 @@ function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel
 
 
     end
+    plot(xyPanel(:,1),xyPanel(:,2),'k','linewidth',2);
     hold off 
     title(strcat('alpha (deg) = ',num2str(alpha_rad*180/pi,3), ';  V = [', num2str(vel(1)),', ',num2str(vel(2)), '];  t = ', num2str(t), ';  dt = ', num2str(dt), ';  Np = ', num2str(np)));
-
-    M(round(t/dt/frames)) = getframe;
+    xlim([-0.3, 0.06]) 
+    %ylim([-0.08, 0.08])
+    
+    set(gca,'visible','off')
+    filename = 'test.gif';
+    
+    frame = getframe(1);
+    im = frame2im(frame);
+    [imind,cm] = rgb2ind(im,256);
+    
+    if t == dt
+        imwrite(imind,cm,filename,'gif', 'Loopcount',inf);
+    else
+        imwrite(imind,cm,filename,'gif','DelayTime',0.1,'WriteMode','append');
+    end
+        
+    
 end

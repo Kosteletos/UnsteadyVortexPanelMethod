@@ -17,7 +17,7 @@ if optimisationFlag == 0
     
     alphaDot = (alphaPrev - alpha0)/dt;
     %alpha = pi/4 + 0.035;
-    alpha = pi/12; 
+    alpha = pi/6 + alphaDot*(t-0.4); 
 elseif optimisationFlag == 1
     vel = accel*t; 
     pos = (accel*t^2)/2;
@@ -40,7 +40,7 @@ else
 end
 
 
-%vel = [-0.3,0];
+%vel = [-0.36,0];
 %pos = vel*t;
 
 
