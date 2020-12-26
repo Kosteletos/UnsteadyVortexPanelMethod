@@ -5,16 +5,17 @@ tic
 
 % Simulation Options
 np = 400; % Number of panels
-t = 0.1; % Simulation time [s]
+t = 0.4; % Simulation time [s]
 dt = 0.002; % Time step [s]
 rho = 1000; % Density [kg/m^3]
 chord = 0.12;
 targetLift = 0;
 LEVortex = 1; %1 = true, 0 = false 
 TEVortex = 1;
-Optimise = 0;
+Optimise = 1;
+startOptimiseTime = 0.2; %[s]
 stopOptimiseTime = 2; %[s]
-solveForces = 0;
+solveForces = 1;
 
 %Plotting options
 Plot = 1; % true or false
@@ -30,13 +31,14 @@ h = figure('Renderer', 'painters', 'Position', [10 10 1800 600]); % Figure size
 M(tn) = struct('cdata',[],'colormap',[]);
 [h, M, xm, ym, nx, ny] = preparePlots(h,M);
 xygFSVortex_rel = [];
-totalBoundCirc = 0;
-Ix = 0; Iy = 0;
-Ixf = 0; Iyf = 0;
-Ixb = 0; Iyb = 0;
+totalBoundCirc = zeros(tn+1,1);
+Ix = zeros(tn+1,1); Iy = zeros(tn+1,1);
+Ixf = zeros(tn+1,1); Iyf = zeros(tn+1,1);
+Ixb = zeros(tn+1,1); Iyb = zeros(tn+1,1);
 optimisationFlag = 0;
 deltaLift = 0;
 alphaDot = zeros(tn+1,1);
+%alphaDot = alphaDotModel;
 alpha = zeros(tn+1,1);
 %alpha = alphaModel;
 lift = zeros(tn+1,1);
@@ -59,8 +61,7 @@ while tc <= tn
         [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc), alpha(tc), rho, chord, pos(tc,:), vel(tc,:)); %first alpha should be alpha(tc) for normal mitigation
         %[pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematicsFromPIV(t, PIV);
     elseif optimisationFlag == 2
-        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), rho, chord, pos(tc,:),vel(tc,:));
-            
+        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), rho, chord, pos(tc,:),vel(tc,:));     
     else
         [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), rho, chord, pos(tc,:), [0,0]);
     end
@@ -78,29 +79,21 @@ while tc <= tn
     %     end
 
     %  Assemble the rhs of the equation for the potential flow calculation
-    b = buildRHS(normal_rel, xyCollocation_rel, np, vel(tc+1,:), alphaDot(tc+1), alpha(tc+1), xygFSVortex_rel, totalBoundCirc);
+    b = buildRHS(normal_rel, xyCollocation_rel, np, vel(tc+1,:), alphaDot(tc+1), alpha(tc+1), xygFSVortex_rel, totalBoundCirc(tc));
     
     % Solve for surface vortex sheet strength
     gam = A\b; 
 
     %uv_vec = testUV(alpha(tc+1), pos, np, gam, chord);
     
-    totalBoundCirc = totalBoundCirculation(LEVortex, TEVortex, gam, np);
+    totalBoundCirc(tc+1) = totalBoundCirculation(LEVortex, TEVortex, gam, np);
     
     if solveForces == 1
-        if iterationCounter == 0
-            Ix0 = Ix; Iy0 = Iy;
-            Ixf0 = Ixf; Iyf0 = Iyf;
-            Ixb0 = Ixb; Iyb0 = Iyb;
-            [lift(tc+1), drag(tc+1), Ix, Iy, Ixf, Iyf, Ixb, Iyb, cl(tc+1),LiftComponents(tc,:)] = Forces(dt, alpha(tc+1), rho, xygFSVortex_rel, xyBoundVortex_rel, gam, Ix, Iy, Ixf, Iyf, Ixb, Iyb, chord);
-        else
-            [lift(tc+1), drag(tc+1), Ix, Iy, Ixf, Iyf, Ixb, Iyb, cl(tc+1), LiftComponents(tc,:)] = Forces(dt, alpha(tc+1), rho, xygFSVortex_rel, xyBoundVortex_rel, gam, Ix0, Iy0, Ixf0, Iyf0, Ixb0, Iyb0, chord);
-        end
+        [lift(tc+1), drag(tc+1), Ix(tc+1), Iy(tc+1), Ixf(tc+1), Iyf(tc+1), Ixb(tc+1), Iyb(tc+1), cl(tc+1),LiftComponents(tc,:)] = Forces(dt, alpha(tc+1), rho, xygFSVortex_rel, xyBoundVortex_rel, gam, Ix(tc), Iy(tc), Ixf(tc), Iyf(tc), Ixb(tc), Iyb(tc), chord);
     
-        %if (lift(tc+1) > targetLift) && (Optimise == 1)
-        if (t>0.5) && (Optimise == 1) && (optimisationFlag ~=2)
+        if (t>startOptimiseTime) && (Optimise == 1) && (optimisationFlag == 0)
             optimisationFlag = 1;
-            targetLift = lift(501);
+            targetLift = lift(tc);
         end
           
         deltaLift = targetLift - lift(tc+1);
@@ -120,7 +113,7 @@ while tc <= tn
     
   
     iterationCounter = iterationCounter + 1;
-    if (abs(deltaLift)< 1e-2) || (optimisationFlag == 0) %normally 5e-5 
+    if (abs(deltaLift)< 1e-2) || (optimisationFlag == 0) % delta lift to be sent to an appropriate value for the problem
         if (mod(tc,frames) == 0 || t == dt) && Plot == 1
             [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos(tc+1,:), vel(tc+1,:), gam, xygFSVortex_rel, np, t, dt, chord, Streamlines);
         end
