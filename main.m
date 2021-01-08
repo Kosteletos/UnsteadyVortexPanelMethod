@@ -5,23 +5,23 @@ tic
 
 % Simulation Options
 np = 400; % Number of panels
-t = 0.4; % Simulation time [s]
-dt = 0.002; % Time step [s]
+t = 1.2; % Simulation time [s]
+dt = 0.001; % Time step [s]
 rho = 1000; % Density [kg/m^3]
 chord = 0.12;
 targetLift = 0;
 LEVortex = 1; %1 = true, 0 = false 
 TEVortex = 1;
 Optimise = 1;
-startOptimiseTime = 0.2; %[s]
-stopOptimiseTime = 2; %[s]
+startOptimiseTime = 0.5; %[s]
+stopOptimiseTime = 1; %[s]
 solveForces = 1;
 
 %Plotting options
-Plot = 1; % true or false
+Plot = 0; % true or false
 Streamlines = 0;  % true or false
 Vortices = 1;     % true or false 
-frames = 5;   % How often a frame is saved.
+frames = 20;   % How often a frame is saved.
 %load("PIVData/PIV-Vel_322_Angle_15_Acc_50") % Load PIV data if needed
 
 % Initialisations

@@ -9,35 +9,41 @@ function [pos, vel, alpha, alphaDot] = kinematics(t, dt, optimisationFlag, delta
 accel = [-0.4, 0]; % e.g. moving to the left at unit constant acceleration => [-1,0]
 
 if optimisationFlag == 0
-    vel = accel*t; 
-    pos = (accel*t^2)/2;
+    %vel = accel*t; 
+    %pos = (accel*t^2)/2;
     
-    %vel = [-0.4,0];
-    %pos = vel*t;
+    vel = [-0.4,0];
+    pos = vel*t;
     
     alpha = pi/6; 
     alphaDot = (alpha - alpha0)/dt;
     if t == dt
-        alphaDot = 0; % this is a poor fix
+        alphaDot = 0; % this is a poor fix as initial alphaDot could be non-zero
     end
     %alpha = pi/4 + 0.035;
 
 elseif optimisationFlag == 1
-    vel = accel*t; 
-    pos = (accel*t^2)/2;
+    %vel = accel*t; 
+    %pos = (accel*t^2)/2;
     
-    %vel = [-0.4,0] + accel*(t-0.5); 
-    %pos = [-0.4,0]*t + (accel*(t-0.5)^2)/2;
+    vel = [-0.4,0] + accel*(t-0.5); 
+    pos = [-0.4,0]*t + (accel*(t-0.5)^2)/2;
     
     cl = deltaLift/(0.5*rho*norm(vel)^2*chord);
-    alpha = alphaPrev + cl/(2*pi*400);
+    alpha = alphaPrev + cl/(2*pi*500);
+    if abs(alpha)> pi
+       alpha = 0; 
+    end
     alphaDot = (alpha - alpha0)/dt;  
 else
     pos = pos + vel*dt;
     accel = [0,0];
     
     cl = deltaLift/(0.5*rho*norm(vel)^2*chord);
-    alpha = alphaPrev + cl/(2*pi*400);
+    alpha = alphaPrev + cl/(2*pi*500);
+    if abs(alpha)> pi
+       alpha = 0; 
+    end
     alphaDot = (alpha - alpha0)/dt;  
     
 
