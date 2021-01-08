@@ -1,5 +1,0 @@
-Section identifier              : 2D_test_foil
-Number of panels                : 400
-Reynolds number                 : 20e6
-Angle of Incidence  (degrees)   : 5
-Time Iterations                 : 10

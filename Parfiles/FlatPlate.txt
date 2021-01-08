@@ -1,5 +1,0 @@
-Section identifier              : FlatPlate
-Number of panels                : 200
-Reynolds number                 : 20e6
-Angle of Incidence  (degrees)   : 10
-Time Iterations                 : 10

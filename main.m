@@ -1,67 +1,135 @@
-%    foil.m
-%
-%  Script to analyse an aerofoil section using potential flow calculation
-%  
-
-
 close all
 clear all
 addpath(genpath(pwd))
+tic
 
-%  Read in the parameter file
-%caseref = input('Enter case reference: ','s');
-%parfile = ['Parfiles/' caseref '.txt'];
-parfile = ('Parfiles/FlatPlate.txt');
-%parfile = ['Parfiles/test.txt'];
-fprintf(1, '%s\n\n', ['Reading in parameter file: ' parfile])
-[section, np, Re, alpha_deg, nt] = par_read(parfile);
+% Simulation Options
+np = 400; % Number of panels
+t = 1.2; % Simulation time [s]
+dt = 0.001; % Time step [s]
+rho = 1000; % Density [kg/m^3]
+chord = 0.12;
+targetLift = 0;
+LEVortex = 1; %1 = true, 0 = false 
+TEVortex = 1;
+Optimise = 1;
+startOptimiseTime = 0.5; %[s]
+stopOptimiseTime = 1; %[s]
+solveForces = 1;
 
-%  Read in the section geometry
-secfile = ['BodyGeom/' section '.surf'];
-[xk, yk] = textread ( secfile, '%f%f' );
+%Plotting options
+Plot = 0; % true or false
+Streamlines = 0;  % true or false
+Vortices = 1;     % true or false 
+frames = 20;   % How often a frame is saved.
+%load("PIVData/PIV-Vel_322_Angle_15_Acc_50") % Load PIV data if needed
 
-%  Generate high-resolution surface description via cubic splines
-nphr = 5*np;
-[xshr, yshr] = splinefit ( xk, yk, nphr );
+% Initialisations
+prevToc = 0;
+tn = round(t/dt);
+h = figure('Renderer', 'painters', 'Position', [10 10 1800 600]); % Figure size
+M(tn) = struct('cdata',[],'colormap',[]);
+[h, M, xm, ym, nx, ny] = preparePlots(h,M);
+xygFSVortex_rel = [];
+totalBoundCirc = zeros(tn+1,1);
+Ix = zeros(tn+1,1); Iy = zeros(tn+1,1);
+Ixf = zeros(tn+1,1); Iyf = zeros(tn+1,1);
+Ixb = zeros(tn+1,1); Iyb = zeros(tn+1,1);
+optimisationFlag = 0;
+deltaLift = 0;
+alphaDot = zeros(tn+1,1);
+%alphaDot = alphaDotModel;
+alpha = zeros(tn+1,1);
+%alpha = alphaModel;
+lift = zeros(tn+1,1);
+drag = zeros(tn+1,1);
+cl = zeros(tn+1,1);
+pos = zeros(tn+1,2);
+vel = zeros(tn+1,2);
+LiftComponents = zeros(tn+1,2);
 
-%  Resize section so that it lies between (0,0) and (1,0)
-[xsin, ysin] = resize ( xshr, yshr );
+% Assemble lhs of the equation in relative coords (i.e doesn't change)
+[xyPanel_rel, xyCollocation_rel, xyBoundVortex_rel, normal_rel] = makePanels(0, [0,0], np, chord);
+A = buildLHS(xyCollocation_rel, xyBoundVortex_rel, normal_rel, np);
+ 
+tc = 1;
+iterationCounter = 0;
+while tc <= tn    
+    t = tc*dt;
+    
+    if iterationCounter == 0
+        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc), alpha(tc), rho, chord, pos(tc,:), vel(tc,:)); %first alpha should be alpha(tc) for normal mitigation
+        %[pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematicsFromPIV(t, PIV);
+    elseif optimisationFlag == 2
+        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), rho, chord, pos(tc,:),vel(tc,:));     
+    else
+        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), rho, chord, pos(tc,:), [0,0]);
+    end
+    
+    
+    % For shedding the LE and TE vortex to a point where to LE and TE were at
+    % previous time step
 
-%  Interpolate to required number of panels (uniform size)
-[xs, ys] = make_upanels ( xsin, ysin, np );
+    %     if exist('xyPanel', 'var') 
+    %         [A, xyBoundVortex_rel, xyPanel] = updateLHS(xyPanel, alpha(tc+1), pos, np, normal_rel, xyBoundVortex_rel, xyCollocation_rel, xyPanel_rel, A);
+    %     else
+    %         [xyPanel, xyCollocation, xyBoundVortex, ~] = makePanels(alpha(tc+1), pos, np, panelLength);
+    % %         Panel postion plotting Tool
+    % %         panelPosPlotting(xyPanel, xyCollocation, xyBoundVortex);
+    %     end
 
-xfsVortex = [];
-yfsVortex = [];
-gamfsVortex = [];
+    %  Assemble the rhs of the equation for the potential flow calculation
+    b = buildRHS(normal_rel, xyCollocation_rel, np, vel(tc+1,:), alphaDot(tc+1), alpha(tc+1), xygFSVortex_rel, totalBoundCirc(tc));
+    
+    % Solve for surface vortex sheet strength
+    gam = A\b; 
 
-%Generate flat plate surface description:
-%xs = linspace(0,1,np);
-%ys = zeros(1,np);
-
-dt = 0.01;
-for t = 1:nt 
-    %  Assemble the lhs of the equations for the potential flow calculation
-    A = build_lhs ( xs, ys );
-    Am1 = inv(A);
-
-
-    %    rhs of equations
-    alpha_rad = pi * alpha_deg/180;
-    b = build_rhs ( xs, ys, alpha_rad, xfsVortex, yfsVortex, gamfsVortex);
-
-    %    solve for surface vortex sheet strength
-    gam = Am1 * b;
-
-    %    calculate cp distribution and overall circulation
-    [cp, TotalCirc, FinalPanelCirc] = potential_op ( xs, ys, gam );
-
-    [xfsVortex, yfsVortex, gamfsVortex] = BiotSavart(FinalPanelCirc, dt, xs, ys, gam, xfsVortex, yfsVortex, gamfsVortex);
-
-    %    locate stagnation point and calculate stagnation panel length
-    [ipstag, fracstag] = find_stag(gam);
-    dsstag = sqrt((xs(ipstag+1)-xs(ipstag))^2 + (ys(ipstag+1)-ys(ipstag))^2);
-
-
+    %uv_vec = testUV(alpha(tc+1), pos, np, gam, chord);
+    
+    totalBoundCirc(tc+1) = totalBoundCirculation(LEVortex, TEVortex, gam, np);
+    
+    if solveForces == 1
+        [lift(tc+1), drag(tc+1), Ix(tc+1), Iy(tc+1), Ixf(tc+1), Iyf(tc+1), Ixb(tc+1), Iyb(tc+1), cl(tc+1),LiftComponents(tc,:)] = Forces(dt, alpha(tc+1), rho, xygFSVortex_rel, xyBoundVortex_rel, gam, Ix(tc), Iy(tc), Ixf(tc), Iyf(tc), Ixb(tc), Iyb(tc), chord);
+    
+        if (t>startOptimiseTime) && (Optimise == 1) && (optimisationFlag == 0)
+            optimisationFlag = 1;
+            targetLift = lift(tc);
+        end
+          
+        deltaLift = targetLift - lift(tc+1);
+    end
+    
+    itToc = toc;
+    disp(['simTime=',num2str(t),',  iteration=',num2str(iterationCounter), ',  itTime=',num2str(itToc-prevToc)]);
+    prevToc = itToc; 
+    
+    if (tc == tn && (abs(deltaLift)< 1e-2 || Optimise==0))
+        toc
+        if solveForces == 1
+            plotForces(lift, LiftComponents, drag, cl, alpha, alphaDot, dt);
+        end
+        [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos(tc+1,:), vel(tc+1,:), gam, xygFSVortex_rel, np, t, dt, chord, Streamlines);
+    end    
+    
+  
+    iterationCounter = iterationCounter + 1;
+    if (abs(deltaLift)< 1e-2) || (optimisationFlag == 0) % delta lift to be sent to an appropriate value for the problem
+        if (mod(tc,frames) == 0 || t == dt) && Plot == 1
+            [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos(tc+1,:), vel(tc+1,:), gam, xygFSVortex_rel, np, t, dt, chord, Streamlines);
+        end
+        if (t > stopOptimiseTime) && (Optimise == 1)
+           optimisationFlag = 2; 
+        end
+        
+        % Trailing edge vortex is released, wake moves with flow
+        [xygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel(tc+1,:), alpha(tc+1), alphaDot(tc+1), xyBoundVortex_rel, gam, xygFSVortex_rel);
+        tc = tc + 1;
+        iterationCounter = 0;
+    end
+    
 end
 
-streamfunction_plotting(gam, xs, ys, alpha_rad, ipstag, xfsVortex, yfsVortex);
+
+
+
+
