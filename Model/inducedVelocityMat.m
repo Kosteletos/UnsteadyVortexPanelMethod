@@ -13,7 +13,7 @@ function [uv_x, uv_y] = inducedVelocityMat(gam,xy,xyVortex)
     dy = y_mat - y_vor_mat;
 
     r = (dx.^2 + dy.^2).^0.5; 
-    R = 1e-5 ;
+    R = 1e-4 ;
 
 
     % Standard vortex model 

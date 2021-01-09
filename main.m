@@ -4,20 +4,20 @@ addpath(genpath(pwd))
 tic
 
 % Simulation Options
-np = 400; % Number of panels
-t = 0.5; % Simulation time [s]
+np = 100; % Number of panels
+t = 1.5; % Simulation time [s]
 dt = 0.001; % Time step [s]
 rho = 1000; % Density [kg/m^3]
 chord = 0.12; % [m]
 LEVortex = 1; %1 = true, 0 = false 
 TEVortex = 1; %1 = true, 0 = false 
 Optimise = 1; %1 = true, 0 = false 
-startOptimiseTime = 0.25; %[s]
+startOptimiseTime = 0.5; %[s]
 stopOptimiseTime = 1; %[s]
 solveForces = 1;
 
 %Plotting options
-Plot = 0; % true or false
+Plot = 1; % true or false
 Streamlines = 0;  % true or false
 Vortices = 1;     % true or false 
 frames = 20;   % How often a frame is saved.
@@ -42,6 +42,7 @@ alphaDot = zeros(tn+1,1);
 alpha = zeros(tn+1,1);
 %alpha = alphaModel;
 lift = zeros(tn+1,1);
+alpha_dLift_vec = zeros(tn+1,500,2);
 drag = zeros(tn+1,1);
 cl = zeros(tn+1,1);
 pos = zeros(tn+1,2);
@@ -58,12 +59,12 @@ while tc <= tn
     t = tc*dt;
     
     if iterationCounter == 0
-        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc), alpha(tc), rho, chord, pos(tc,:), vel(tc,:)); %first alpha should be alpha(tc) for normal mitigation
+        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, startOptimiseTime, deltaLift, alpha(tc), alpha(tc), rho, chord, pos(tc,:), vel(tc,:)); 
         %[pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematicsFromPIV(t, PIV);
     elseif optimisationFlag == 2
-        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), rho, chord, pos(tc,:),vel(tc,:));     
+        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, startOptimiseTime, deltaLift, alpha(tc+1), alpha(tc), rho, chord, pos(tc,:),vel(tc,:));     
     else
-        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), rho, chord, pos(tc,:), [0,0]);
+        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, startOptimiseTime, deltaLift, alpha(tc+1), alpha(tc), rho, chord, pos(tc,:), [0,0]);
     end
     
     
@@ -93,10 +94,12 @@ while tc <= tn
     
         if (t>startOptimiseTime) && (Optimise == 1) && (optimisationFlag == 0)
             optimisationFlag = 1;
-            targetLift = lift(tc);
+            targetLift = (lift(tc)+lift(tc-1)+lift(tc-2))/3;
         end
           
         deltaLift = targetLift - lift(tc+1);
+        alpha_dLift_vec(tc,iterationCounter+1,:) = [alpha(tc+1),deltaLift]; %-----------------------------------------------------------------------------------------------------
+
     end
     
     itToc = toc;
@@ -120,6 +123,12 @@ while tc <= tn
         if (t > stopOptimiseTime) && (Optimise == 1)
            optimisationFlag = 2; 
         end
+        
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        if optimisationFlag == 1
+            %plotLiftAlpha(alpha_dLift_vec, tc);
+        end
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         % Trailing edge vortex is released, wake moves with flow
         [xygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel(tc+1,:), alpha(tc+1), alphaDot(tc+1), xyBoundVortex_rel, gam, xygFSVortex_rel);
