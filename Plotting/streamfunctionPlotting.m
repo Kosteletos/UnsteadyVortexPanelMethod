@@ -1,6 +1,7 @@
-function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel, gam , xygFSVortex_rel, np, t, dt, panelLength, Streamlines)
+function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel, gam , xygFSVortex_rel, np, t, dt, Streamlines)
  
-    [xyPanel, ~, xyBoundVortex, ~] = makePanels(alpha_rad, pos, np, panelLength);
+
+    [xyPanel, ~, xyBoundVortex, ~] = makePanels(alpha_rad, pos, np);
     
     %Rel frame to inertial frame transform
     inerToRel = [cos(alpha_rad), sin(alpha_rad); -sin(alpha_rad), cos(alpha_rad)]; % inertial frame to relative frame

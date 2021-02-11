@@ -1,4 +1,7 @@
-function [xyPanel, xyCollocation, xyBoundVortex, normal] = makePanels(alpha, pos, np, panelLength)
+function [xyPanel, xyCollocation, xyBoundVortex, normal] = makePanels(alpha, pos, np)
+
+global chord
+panelLength = chord;
 
 position = [-panelLength/2*cos(alpha) + pos(1), panelLength/2*sin(alpha) + pos(2) ; panelLength/2*cos(alpha) + pos(1), -panelLength/2*sin(alpha) + pos(2)]; %xy_start ; xy_end
 

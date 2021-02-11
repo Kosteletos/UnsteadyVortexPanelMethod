@@ -1,11 +1,11 @@
-function [pos, vel, alpha, alphaDot] = kinematics(t, dt, optimisationFlag, startOptimise, deltaLift, alphaPrev, alpha0, rho, pos,vel)
+function [pos, vel, alpha, alphaDot] = kinematics(t, dt, optimisationFlag, startOptimise, deltaLift, alphaPrev, alpha0, pos,vel)
 %Defines the movement of the plate 
 
 %position, velocity and rotation of moving ref frame
 %vel = [-1,0];
 %pos = vel*t;
 
-global chord
+global chord rho
 
 accel = [-0.6, 0]; % e.g. moving to the left at unit constant acceleration => [-1,0]
 

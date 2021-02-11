@@ -1,4 +1,6 @@
-function [Lift, Drag, Ix, Iy, Ixf, Iyf, Ixb, Iyb, cl] = Forces(dt, alpha_rad, rho, xygFSVortex_rel, xyBoundVortex_rel, gam, IxPrev, IyPrev, IxfPrev, IyfPrev, IxbPrev, IybPrev, chord)
+function [Lift, Drag, Ix, Iy, Ixf, Iyf, Ixb, Iyb, cl] = Forces(dt, alpha_rad, xygFSVortex_rel, xyBoundVortex_rel, gam, IxPrev, IyPrev, IxfPrev, IyfPrev, IxbPrev, IybPrev)
+
+global chord rho
 
 Ixb = 0; Iyb = 0; % bound
 Ixf = 0; Iyf = 0; % free-stream
