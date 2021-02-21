@@ -7,19 +7,19 @@ global chord rho
 
 % Simulation Options
 np = 100; % Number of panels
-t = 0.5; % Simulation time [s]
+t = 1; % Simulation time [s]
 dt = 0.001; % Time step [s]
 rho = 1000; % Density [kg/m^3]
 chord = 0.12; % [m]
 LEVortex = 0; %1 = true, 0 = false 
 TEVortex = 1; %1 = true, 0 = false 
-Optimise = 0; %1 = true, 0 = false 
+Optimise = 1; %1 = true, 0 = false 
 startOptimiseTime = 0.5; %[s]
 stopOptimiseTime = 1; %[s]
 solveForces = 1;
 
 %Plotting options
-Plot = 1; % true or false
+Plot = 0; % true or false
 Streamlines = 0;  % true or false
 Vortices = 1;     % true or false 
 frames = 20;   % How often a frame is saved.
@@ -48,7 +48,6 @@ lift = zeros(tn+1,1);
 lift_am = zeros(tn+1,1);
 alpha_dLift_vec = zeros(tn+1,500,2);
 drag = zeros(tn+1,1);
-cl = zeros(tn+1,1);
 pos = zeros(tn+1,2);
 vel = zeros(tn+1,2);
 
@@ -99,8 +98,8 @@ while tc <= tn
     totalBoundCirc_am(tc+1) = totalBoundCirculation(LEVortex, TEVortex, gam_am, np);
     
     if solveForces == 1
-        [lift(tc+1), drag(tc+1), Ix(tc+1), Iy(tc+1), Ixf(tc+1), Iyf(tc+1), Ixb(tc+1), Iyb(tc+1), cl(tc+1)] = Forces(dt, alpha(tc+1), xygFSVortex_rel, xyBoundVortex_rel, gam, Ix(tc), Iy(tc), Ixf(tc), Iyf(tc), Ixb(tc), Iyb(tc));
-        [lift_am(tc+1), ~, Ix_am(tc+1), Iy_am(tc+1), ~,~, Ixb_am(tc+1), Iyb_am(tc+1), ~] = Forces(dt, alpha(tc+1), [], xyBoundVortex_rel, gam_am, Ix_am(tc), Iy_am(tc), 0, 0, Ixb_am(tc), Iyb_am(tc));  %added mass
+        [lift(tc+1), drag(tc+1), Ix(tc+1), Iy(tc+1), Ixf(tc+1), Iyf(tc+1), Ixb(tc+1), Iyb(tc+1)] = Forces(dt, alpha(tc+1), xygFSVortex_rel, xyBoundVortex_rel, gam, Ix(tc), Iy(tc), Ixf(tc), Iyf(tc), Ixb(tc), Iyb(tc));
+        [lift_am(tc+1), ~, Ix_am(tc+1), Iy_am(tc+1), ~,~, Ixb_am(tc+1), Iyb_am(tc+1)] = Forces(dt, alpha(tc+1), [], xyBoundVortex_rel, gam_am, Ix_am(tc), Iy_am(tc), 0, 0, Ixb_am(tc), Iyb_am(tc));  %added mass
         
         if (t>startOptimiseTime) && (Optimise == 1) && (optimisationFlag == 0)
             optimisationFlag = 1;
@@ -119,14 +118,15 @@ while tc <= tn
     if (tc == tn && (abs(deltaLift)< 1e-2 || Optimise==0))
         toc
         if solveForces == 1
-            plotForces(lift, lift_am, drag, cl, alpha, alphaDot, pos, dt);
+            plotForces(lift, lift_am, alpha, alphaDot, pos, vel, dt);
+            plotAlpha(alpha, alphaDot, pos, dt)
         end
         [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos(tc+1,:), vel(tc+1,:), gam, xygFSVortex_rel, np, t, dt, Streamlines);
     end    
     
   
     iterationCounter = iterationCounter + 1;
-    if (abs(deltaLift)< 1e-2) || (optimisationFlag == 0) % delta lift to be sent to an appropriate value for the problem
+    if (abs(deltaLift)< 1e-3) || (optimisationFlag == 0) % delta lift to be sent to an appropriate value for the problem
         if (mod(tc,frames) == 0 || t == dt) && Plot == 1
             [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos(tc+1,:), vel(tc+1,:), gam, xygFSVortex_rel, np, t, dt, Streamlines);
         end
@@ -135,9 +135,10 @@ while tc <= tn
         end
         
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        if optimisationFlag == 1
-            %plotLiftAlpha(alpha_dLift_vec, tc);
-        end
+        % for testing what the lift-alpha plots look like
+        %if optimisationFlag == 1 && t == 0.516
+        %    plotLiftAlpha(alpha_dLift_vec, tc);
+        %end
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         % Trailing edge vortex is released, wake moves with flow
