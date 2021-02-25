@@ -59,20 +59,24 @@ vel = zeros(tn+1,2);
 [xyPanel_rel, xyCollocation_rel, xyBoundVortex_rel, normal_rel] = makePanels(0, [0,0], np);
 A = buildLHS(xyCollocation_rel, xyBoundVortex_rel, normal_rel, np);
  
+% Plate Kinematics
+t_array = 0:dt:t;
+[pos, vel] = translation(t_array);
+
+
 tc = 1;
 iterationCounter = 0;
-
 
 while tc <= tn    
     t = tc*dt;
     
     if iterationCounter == 0
-        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, startOptimiseTime, deltaLift, alpha(tc), alpha(tc), pos(tc,:), vel(tc,:)); 
+        [alpha(tc+1), alphaDot(tc+1)] = rotation(t, dt, optimisationFlag, deltaLift, alpha(tc), alpha(tc), vel(tc,:)); 
         %[pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematicsFromPIV(t, PIV);
     elseif optimisationFlag == 2
-        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, startOptimiseTime, deltaLift, alpha(tc+1), alpha(tc), pos(tc,:),vel(tc,:));     
+        [alpha(tc+1), alphaDot(tc+1)] = rotation(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), vel(tc,:));     
     else
-        [pos(tc+1,:), vel(tc+1,:), alpha(tc+1), alphaDot(tc+1)] = kinematics(t, dt, optimisationFlag, startOptimiseTime, deltaLift, alpha(tc+1), alpha(tc), pos(tc,:), [0,0]);
+        [alpha(tc+1), alphaDot(tc+1)] = rotation(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), [0,0]);
     end
     
     

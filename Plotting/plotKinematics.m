@@ -9,13 +9,13 @@ pos_x = -pos(:,1);
 
 % Velocity Time
 figure(6)
-plot(t.',vel_x)
+plot(t(2:end),vel_x(2:end))
 ylabel("Velocity [m/s]")
 xlabel("Time [s]")
 
 % Position Time
 figure(7)
-plot(t.' ,pos_x)
+plot(t ,pos_x)
 ylabel("Displacement [m]")
 xlabel("Time [s]")
 
