@@ -3,12 +3,12 @@ clear all
 addpath(genpath(pwd))
 tic
 
-global chord rho
+global chord rho folder subfolder
 
 % Simulation Options
 np = 100; % Number of panels
 t = 1; % Simulation time [s]
-dt = 0.001; % Time step [s]
+dt = 0.01; % Time step [s]
 rho = 1000; % Density [kg/m^3]
 chord = 0.12; % [m]
 LEVortex = 0; %1 = true, 0 = false 
@@ -17,8 +17,11 @@ Optimise = 1; %1 = true, 0 = false
 startOptimiseTime = 0.5; %[s]
 stopOptimiseTime = 1; %[s]
 solveForces = 1;
+maxError = 5e-4;
 
 %Plotting options
+folder = "C:\Users\Tom\OneDrive - University of Cambridge\Uni Notes\IIB\Project\Low-Order Model\Figures\Comparison\Surge Gust Mitigation";
+subfolder = "accel = 1 chords, alpha = pi_4 rad";
 Plot = 0; % true or false
 Streamlines = 0;  % true or false
 Vortices = 1;     % true or false 
@@ -115,18 +118,18 @@ while tc <= tn
     disp(['simTime=',num2str(t),',  iteration=',num2str(iterationCounter), ',  itTime=',num2str(itToc-prevToc)]);
     prevToc = itToc; 
     
-    if (tc == tn && (abs(deltaLift)< 1e-2 || Optimise==0))
+    if (tc == tn && (abs(deltaLift)< maxError || Optimise==0))
         toc
         if solveForces == 1
-            plotForces(lift, lift_am, alpha, alphaDot, pos, vel, dt);
-            plotAlpha(alpha, alphaDot, pos, dt)
+            plotForces(lift, lift_am, LEVortex, alpha, alphaDot, pos, vel, dt);
+            plotAlpha(alpha, alphaDot, LEVortex, pos, dt)
         end
         [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos(tc+1,:), vel(tc+1,:), gam, xygFSVortex_rel, np, t, dt, Streamlines);
     end    
     
   
     iterationCounter = iterationCounter + 1;
-    if (abs(deltaLift)< 1e-3) || (optimisationFlag == 0) % delta lift to be sent to an appropriate value for the problem
+    if (abs(deltaLift)< maxError) || (optimisationFlag == 0) % delta lift to be sent to an appropriate value for the problem
         if (mod(tc,frames) == 0 || t == dt) && Plot == 1
             [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos(tc+1,:), vel(tc+1,:), gam, xygFSVortex_rel, np, t, dt, Streamlines);
         end

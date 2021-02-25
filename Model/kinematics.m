@@ -7,7 +7,7 @@ function [pos, vel, alpha, alphaDot] = kinematics(t, dt, optimisationFlag, start
 
 global chord rho
 
-accel = [-0.24, 0]; % e.g. moving to the left at unit constant acceleration => [-1,0]
+accel = [-0.12, 0]; % e.g. moving to the left at unit constant acceleration => [-1,0]
 
 if optimisationFlag == 0
     vel = accel*t; 
@@ -20,7 +20,7 @@ if optimisationFlag == 0
     %alpha = omega*t;
     %alphaDot = omega;
     
-    alpha = 0.1; 
+    alpha = pi/4; 
     alphaDot = (alpha - alpha0)/dt;
     if t == dt
         alphaDot = 0; % this is a poor fix as initial alphaDot could be non-zero
@@ -31,11 +31,11 @@ elseif optimisationFlag == 1
     %vel = accel*t; 
     %pos = (accel*t^2)/2;
     
-    vel = [-0.12,0] + accel*(t-startOptimise); 
-    pos = -0.03 + [-0.12,0]*(t-startOptimise) + (accel*(t-startOptimise)^2)/2;
+    vel = [-0.06,0] + accel*(t-startOptimise);   % v = u0 + a*(t-tstart) 
+    pos = -0.015 + [-0.06,0]*(t-startOptimise) + (accel*(t-startOptimise)^2)/2; % s = s0 + u(t-tStart) + 0.5a(t-tStart)^2
     
     cl = deltaLift/(0.5*rho*norm(vel)^2*chord);
-    alpha = alphaPrev + cl/(2*pi*500);
+    alpha = alphaPrev + cl/(2*pi*500); %500 for 1 chords/s, 10 for 10 chords/s
     if abs(alpha)> pi
        alpha = 0; 
     end

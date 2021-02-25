@@ -1,7 +1,7 @@
-function plotForces(Lift, Lift_am, alpha, alphaDot, pos, vel, dt)%, PIV)
+function plotForces(Lift, Lift_am, LEVortex, alpha, alphaDot, pos, vel, dt)%, PIV)
 %Plot force, alpha, and alphaDot obtained for the flow.
 
-global chord rho
+global chord rho folder subfolder
 
 characteristic_velocity = abs(vel(end,1));
 
@@ -31,7 +31,11 @@ legend("Total Lift", "Added-Mass","Circulatory","alpha","Location","northwest");
 %legend("lift", "Added-mass", "Circulatory")
 xlabel("Time (s)")
 title("PM  Lift Coefficient - Time")
-
+if LEVortex == 1
+    savefig(fullfile(folder,subfolder,"PM LEV lift - time.fig"))
+else
+    savefig(fullfile(folder,subfolder,"PM lift - time.fig"))
+end
 
 % Cl - Displacement Plot
 figure(3)
@@ -46,6 +50,10 @@ ylabel('C_l')
 xlabel("Displacement (s / c)")
 legend("Total Lift", "Added-mass", "Circulatory","Location","northwest");
 title("PM  Lift Coefficient - Displacement")
-
+if LEVortex == 1
+    savefig(fullfile(folder,subfolder,"PM LEV lift - displacement.fig"))
+else
+    savefig(fullfile(folder,subfolder,"PM lift - displacement.fig"))
+end
 end
 
