@@ -7,22 +7,22 @@ global chord rho folder subfolder
 
 % Simulation Options
 np = 100; % Number of panels
-t = 1; % Simulation time [s]
+t = 2; % Simulation time [s]
 dt = 0.01; % Time step [s]
 rho = 1000; % Density [kg/m^3]
 chord = 0.12; % [m]
 LEVortex = 0; %1 = true, 0 = false 
 TEVortex = 1; %1 = true, 0 = false 
-Optimise = 1; %1 = true, 0 = false 
+Optimise = 0; %1 = true, 0 = false 
 startOptimiseTime = 0.5; %[s]
-stopOptimiseTime = 1; %[s]
+stopOptimiseTime = 5; %[s]
 solveForces = 1;
 maxError = 5e-4;
 
 %Plotting options
-folder = "C:\Users\Tom\OneDrive - University of Cambridge\Uni Notes\IIB\Project\Low-Order Model\Figures\Comparison\Surge Gust Mitigation";
-subfolder = "accel = 1 chords, alpha = pi_4 rad";
-Plot = 0; % true or false
+folder = "C:\Users\Tom\OneDrive - University of Cambridge\Uni Notes\IIB\Project\Low-Order Model\Figures\Comparison\Steady State Acceleration";
+subfolder = "test";
+Plot = 1; % true or false
 Streamlines = 0;  % true or false
 Vortices = 1;     % true or false 
 frames = 20;   % How often a frame is saved.
@@ -122,7 +122,8 @@ while tc <= tn
         toc
         if solveForces == 1
             plotForces(lift, lift_am, LEVortex, alpha, alphaDot, pos, vel, dt);
-            plotAlpha(alpha, alphaDot, LEVortex, pos, dt)
+            plotAlpha(alpha, alphaDot, LEVortex, pos, dt);
+            plotKinematics(dt,pos,vel);
         end
         [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos(tc+1,:), vel(tc+1,:), gam, xygFSVortex_rel, np, t, dt, Streamlines);
     end    

@@ -7,20 +7,24 @@ function [pos, vel, alpha, alphaDot] = kinematics(t, dt, optimisationFlag, start
 
 global chord rho
 
-accel = [-0.12, 0]; % e.g. moving to the left at unit constant acceleration => [-1,0]
+accel = [-1.2, 0]; % e.g. moving to the left at unit constant acceleration => [-1,0]
 
 if optimisationFlag == 0
-    vel = accel*t; 
-    pos = (accel*t^2)/2;
+    % Surge Translation
+    %vel = accel*t; 
+    %pos = (accel*t^2)/2;
     
-    %vel = [-0.4,0];
-    %pos = vel*t;
+    % SS Translation
+    vel = [-0.24,0];
+    pos = vel*t;
     
+    % Prescribed rotation
     %omega = 0.8;
     %alpha = omega*t;
     %alphaDot = omega;
     
-    alpha = pi/4; 
+    % Constant alpha
+    alpha = 0.2; 
     alphaDot = (alpha - alpha0)/dt;
     if t == dt
         alphaDot = 0; % this is a poor fix as initial alphaDot could be non-zero
@@ -28,14 +32,15 @@ if optimisationFlag == 0
     %alpha = pi/4 + 0.035;
 
 elseif optimisationFlag == 1
-    %vel = accel*t; 
-    %pos = (accel*t^2)/2;
     
-    vel = [-0.06,0] + accel*(t-startOptimise);   % v = u0 + a*(t-tstart) 
-    pos = -0.015 + [-0.06,0]*(t-startOptimise) + (accel*(t-startOptimise)^2)/2; % s = s0 + u(t-tStart) + 0.5a(t-tStart)^2
+    % Surge Translation if t_opt = 2
+    vel = accel/2 + accel*(t-startOptimise);   % v = u0 + a*(t-tstart) 
+    pos = accel/8 + accel/2*(t-startOptimise) + (accel*(t-startOptimise)^2)/2; % s = s0 + u(t-tStart) + 0.5a(t-tStart)^2
     
+    
+    % Lift mitigation
     cl = deltaLift/(0.5*rho*norm(vel)^2*chord);
-    alpha = alphaPrev + cl/(2*pi*500); %500 for 1 chords/s, 10 for 10 chords/s
+    alpha = alphaPrev + cl/(2*pi*10); %500 for 1 chords/s, 10 for 10 chords/s
     if abs(alpha)> pi
        alpha = 0; 
     end

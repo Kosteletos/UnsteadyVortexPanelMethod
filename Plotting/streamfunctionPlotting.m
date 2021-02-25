@@ -56,7 +56,7 @@ function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel
     plot(xyPanel(:,1),xyPanel(:,2),'k','linewidth',2);
     hold off 
     title(strcat('alpha (deg) = ',num2str(alpha_rad*180/pi,3), ';  V = [', num2str(vel(1)),', ',num2str(vel(2)), '];  t = ', num2str(t), ';  dt = ', num2str(dt), ';  Np = ', num2str(np)));
-    xlim([-0.3, 0.3]) 
+    xlim([-2.4, 0.3]) % [-0.3,0.3] for 2 m/s^2
     %ylim([-0.08, 0.08])
     
     set(gca,'visible','off')
