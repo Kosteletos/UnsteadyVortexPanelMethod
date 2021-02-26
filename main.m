@@ -14,10 +14,10 @@ chord = 0.12; % [m]
 LEVortex = 0; %1 = true, 0 = false 
 TEVortex = 1; %1 = true, 0 = false 
 Optimise = 0; %1 = true, 0 = false 
-startOptimiseTime = 0.5; %[s]
+startOptimiseTime = 1.0; %[s]
 stopOptimiseTime = 5; %[s]
 solveForces = 1;
-maxError = 5e-4;
+maxError = 5e-3;
 
 %Plotting options
 folder = "C:\Users\Tom\OneDrive - University of Cambridge\Uni Notes\IIB\Project\Low-Order Model\Figures\Comparison\Steady State Acceleration";
@@ -51,8 +51,6 @@ lift = zeros(tn+1,1);
 lift_am = zeros(tn+1,1);
 alpha_dLift_vec = zeros(tn+1,500,2);
 drag = zeros(tn+1,1);
-pos = zeros(tn+1,2);
-vel = zeros(tn+1,2);
 
 
 % Assemble lhs of the equation in relative coords (i.e doesn't change)
@@ -69,15 +67,9 @@ iterationCounter = 0;
 
 while tc <= tn    
     t = tc*dt;
-    
-    if iterationCounter == 0
-        [alpha(tc+1), alphaDot(tc+1)] = rotation(t, dt, optimisationFlag, deltaLift, alpha(tc), alpha(tc), vel(tc,:)); 
-        %[pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematicsFromPIV(t, PIV);
-    elseif optimisationFlag == 2
-        [alpha(tc+1), alphaDot(tc+1)] = rotation(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), vel(tc,:));     
-    else
-        [alpha(tc+1), alphaDot(tc+1)] = rotation(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), [0,0]);
-    end
+
+    %[pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematicsFromPIV(t, PIV);
+    [alpha(tc+1), alphaDot(tc+1)] = rotation(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), vel(tc,:));     
     
     
     % For shedding the LE and TE vortex to a point where to LE and TE were at

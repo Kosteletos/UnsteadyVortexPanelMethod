@@ -3,8 +3,6 @@ function [alpha, alphaDot] = rotation(t, dt, optimisationFlag, deltaLift, alphaP
 
 global chord rho
 
-accel = [-1.2, 0]; % e.g. moving to the left at unit constant acceleration => [-1,0]
-
 if optimisationFlag == 0
     
     % Prescribed rotation
@@ -13,7 +11,7 @@ if optimisationFlag == 0
     %alphaDot = omega;
     
     % Constant alpha
-    alpha = 0.2; 
+    alpha = 0.05; 
     alphaDot = (alpha - alpha0)/dt;
     if t == dt
         alphaDot = 0; % this is a poor fix as initial alphaDot could be non-zero
@@ -25,20 +23,15 @@ elseif optimisationFlag == 1
     
     % Lift mitigation
     cl = deltaLift/(0.5*rho*norm(vel)^2*chord);
-    alpha = alphaPrev + cl/(2*pi*10); %500 for 1 chords/s, 10 for 10 chords/s
+    alpha = alphaPrev + cl/(2*pi*600); %500 for 1 chords/s, 10 for 10 chords/s
     if abs(alpha)> pi
        alpha = 0; 
     end
     alphaDot = (alpha - alpha0)/dt;  
 else
     
-    cl = deltaLift/(0.5*rho*norm(vel)^2*chord);
-    alpha = alphaPrev + cl/(2*pi*100);
-    if abs(alpha)> pi
-       alpha = 0; 
-    end
-    alphaDot = (alpha - alpha0)/dt;  
-    
+    alpha = alpha0; 
+    alphaDot = (alpha - alpha0)/dt;
 
 end
 
