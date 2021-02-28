@@ -1,4 +1,6 @@
-function [Lift, Drag, Ix, Iy, Ixf, Iyf, Ixb, Iyb, cl, LiftComponents] = Forces(dt, alpha_rad, rho, xygFSVortex_rel, xyBoundVortex_rel, gam, IxPrev, IyPrev, IxfPrev, IyfPrev, IxbPrev, IybPrev, chord)
+function [Lift, Drag, Ix, Iy, Ixf, Iyf, Ixb, Iyb] = Forces(dt, alpha_rad, xygFSVortex_rel, xyBoundVortex_rel, gam, IxPrev, IyPrev, IxfPrev, IyfPrev, IxbPrev, IybPrev)
+
+global rho
 
 Ixb = 0; Iyb = 0; % bound
 Ixf = 0; Iyf = 0; % free-stream
@@ -20,25 +22,6 @@ end
 Ixb = sum(xyBoundVortex_rel(:,2).*gam);
 Iyb = sum(xyBoundVortex_rel(:,1).*gam);
 
-%%
-% Added Mass
-Fxb = -rho*(Ixb - IxbPrev)/dt;
-Fyb = -rho*(Iyb - IybPrev)/dt;
-
-Forceb = trans*[Fxb;Fyb];
-Liftb = Forceb(1);
-% Circulatory
-Fxf = -rho*(Ixf - IxfPrev)/dt;
-Fyf = -rho*(Iyf - IyfPrev)/dt;
-
-Forcef = trans*[Fxf;Fyf];
-Liftf = Forcef(1);
-
-
-LiftComponents = [Liftb, Liftf];
-
-%%
-% Total
 Ix = Ixb + Ixf;
 Iy = Iyb + Iyf;
 
@@ -48,8 +31,6 @@ Fy = -rho*(Iy - IyPrev)/dt;
 Force = trans*[Fx;Fy];
 Lift = Force(1);
 Drag = Force(2);
-
-cl = Lift/(0.5*rho*0.32257467^2*chord);
 
 end
 

@@ -1,6 +1,7 @@
-function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel, gam , xygFSVortex_rel, np, t, dt, panelLength, Streamlines)
+function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel, gam , xygFSVortex_rel, np, t, dt, Streamlines)
  
-    [xyPanel, ~, xyBoundVortex, ~] = makePanels(alpha_rad, pos, np, panelLength);
+
+    [xyPanel, ~, xyBoundVortex, ~] = makePanels(alpha_rad, pos, np);
     
     %Rel frame to inertial frame transform
     inerToRel = [cos(alpha_rad), sin(alpha_rad); -sin(alpha_rad), cos(alpha_rad)]; % inertial frame to relative frame
@@ -55,7 +56,7 @@ function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel
     plot(xyPanel(:,1),xyPanel(:,2),'k','linewidth',2);
     hold off 
     title(strcat('alpha (deg) = ',num2str(alpha_rad*180/pi,3), ';  V = [', num2str(vel(1)),', ',num2str(vel(2)), '];  t = ', num2str(t), ';  dt = ', num2str(dt), ';  Np = ', num2str(np)));
-    xlim([-0.3, 0.06]) 
+    xlim([-3, 0.3]) % [-0.3,0.3] for 2 m/s^2
     %ylim([-0.08, 0.08])
     
     set(gca,'visible','off')
