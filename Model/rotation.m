@@ -1,3 +1,4 @@
+
 function [alpha, alphaDot] = rotation(t, dt, optimisationFlag, deltaLift, alphaPrev, alpha0,vel)
 %Defines the rotation of the plate
 
