@@ -1,36 +1,36 @@
 close all
-clear all
+clear all% -except alpha alphaDot
 addpath(genpath(pwd))
 tic
 
 global chord rho folder subfolder
 
-t = 1; % Simulation time [s]
+% Simulation Options
+np = 100; % Number of panels
+t = 3; % Simulation time [s]
 dt = 0.01; % Time step [s]
 rho = 1000; % Density [kg/m^3]
-% Simulation Options
-np = 100; % Number of pane
 chord = 1; % [m]
-LEVortex = 0; %1 = true, 0 = false 
+LEVortex = 1; %1 = true, 0 = false 
 TEVortex = 1; %1 = true, 0 = false 
-Optimise = 0; %1 = true, 0 = false 
-startOptimiseTime = 1.0; %[s]
-stopOptimiseTime = 5; %[s]
+Optimise = 1; %1 = true, 0 = false 
+startOptimiseTime = 1.48; %[s]
+stopOptimiseTime = 10; %[s]
 solveForces = 1;
-maxError = 5e-3;
+maxError = 5e-2;
 
 %Plotting options
-folder = "C:\Users\Tom\OneDrive - University of Cambridge\Uni Notes\IIB\Project\Low-Order Model\Figures\Comparison\Steady State Acceleration";
+folder = "C:\Users\Tom\OneDrive - University of Cambridge\Uni Notes\IIB\Project\Low-Order Model\Figures\Comparison\Steady State Acceleration Gust Mitigation";
 subfolder = "test";
 % Streamfunction Plotter
-Plot = 1; % true or false
+Plot = 0; % true or false
 Streamlines = 0;  % true or false
 Vortices = 1;     % true or false 
-frames = 20;   % How often a frame is saved.
+frames = 10;   % How often a frame is saved.
 % Other Plotters
 plotLiftCoef = 1; %1 = true, 0 = false 
-plotAoA = 0; %1 = true, 0 = false
-plotTranslation = 0; %1 = true, 0 = false
+plotAoA = 1; %1 = true, 0 = false
+plotTranslation = 1; %1 = true, 0 = false
 %load("PIVData/PIV-Vel_322_Angle_15_Acc_50") % Load PIV data if needed
 
 % Initialisations
@@ -47,15 +47,20 @@ Ix = zeros(tn+1,1); Iy = zeros(tn+1,1); Ix_am = zeros(tn+1,1); Iy_am = zeros(tn+
 Ixb = zeros(tn+1,1); Iyb = zeros(tn+1,1); Ixb_am = zeros(tn+1,1); Iyb_am = zeros(tn+1,1);
 Ixf = zeros(tn+1,1); Iyf = zeros(tn+1,1);
 optimisationFlag = 0;
-deltaLift = 0;
+%deltaLift = 0;
+%deltaLiftPrev = 0;
 alphaDot = zeros(tn+1,1);
 %alphaDot = alphaDotModel;
 alpha = zeros(tn+1,1);
 %alpha = alphaModel;
+alphaIter = zeros(5000,1);
+deltaLift = zeros(5000,1);
 lift = zeros(tn+1,1);
 lift_am = zeros(tn+1,1);
 alpha_dLift_vec = zeros(tn+1,500,2);
 drag = zeros(tn+1,1);
+hackFlag = 0;
+i_hack = 0;
 
 
 % Assemble lhs of the equation in relative coords (i.e doesn't change)
@@ -74,8 +79,9 @@ while tc <= tn
     t = tc*dt;
 
     %[pos, vel, alpha(tc+1), alphaDot(tc+1)] = kinematicsFromPIV(t, PIV);
-    [alpha(tc+1), alphaDot(tc+1)] = rotation(t, dt, optimisationFlag, deltaLift, alpha(tc+1), alpha(tc), vel(tc,:));     
-    
+
+    [alpha(tc+1), alphaDot(tc+1),hackFlag,i_hack] = rotation(tc, dt, optimisationFlag, deltaLift, alpha, alphaIter, iterationCounter,i_hack);     
+    alphaIter(iterationCounter+1) = alpha(tc+1);
     
     % For shedding the LE and TE vortex to a point where to LE and TE were at
     % previous time step
@@ -105,13 +111,15 @@ while tc <= tn
         [lift(tc+1), drag(tc+1), Ix(tc+1), Iy(tc+1), Ixf(tc+1), Iyf(tc+1), Ixb(tc+1), Iyb(tc+1)] = Forces(dt, alpha(tc+1), xygFSVortex_rel, xyBoundVortex_rel, gam, Ix(tc), Iy(tc), Ixf(tc), Iyf(tc), Ixb(tc), Iyb(tc));
         [lift_am(tc+1), ~, Ix_am(tc+1), Iy_am(tc+1), ~,~, Ixb_am(tc+1), Iyb_am(tc+1)] = Forces(dt, alpha(tc+1), [], xyBoundVortex_rel, gam_am, Ix_am(tc), Iy_am(tc), 0, 0, Ixb_am(tc), Iyb_am(tc));  %added mass
         
-        if (t>startOptimiseTime) && (Optimise == 1) && (optimisationFlag == 0)
+        if (t>=startOptimiseTime) && (Optimise == 1) && (optimisationFlag == 0)
             optimisationFlag = 1;
             targetLift = (lift(tc)+lift(tc-1)+lift(tc-2))/3;
         end
-          
-        deltaLift = targetLift - lift(tc+1);
-        alpha_dLift_vec(tc,iterationCounter+1,:) = [alpha(tc+1),deltaLift]; %--------------------------------------------------------
+        
+        %deltaLiftPrev = deltaLift;
+        %deltaLift = targetLift - lift(tc+1);
+        deltaLift(iterationCounter+1) = abs(targetLift -  lift(tc+1));
+  
 
     end
     
@@ -119,11 +127,14 @@ while tc <= tn
     disp(['simTime=',num2str(t),',  iteration=',num2str(iterationCounter), ',  itTime=',num2str(itToc-prevToc)]);
     prevToc = itToc; 
          
+%     if (t==startOptimiseTime) && (Optimise == 1)
+%        iterationCounter = -1; % Poorly written code - can do better than this (For hacky method of solving for alpha) 
+%     end
  
     iterationCounter = iterationCounter + 1;
-    if (abs(deltaLift)< maxError) || (optimisationFlag == 0) % delta lift to be sent to an appropriate value for the problem
+    if (abs(deltaLift(iterationCounter))< maxError) || (optimisationFlag == 0) || (hackFlag == 1)
         if (mod(tc,frames) == 0 || t == dt) && Plot == 1
-            [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos(tc+1,:), vel(tc+1,:), gam, xygFSVortex_rel, np, t, dt, Streamlines);
+            [M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc+1), pos(tc+1,:), vel(tc+1,:), gam, xygFSVortex_rel, np, t, dt, Streamlines,LEVortex);
         end
         if (t > stopOptimiseTime) && (Optimise == 1)
            optimisationFlag = 2; 
@@ -139,7 +150,8 @@ while tc <= tn
         % Trailing edge vortex is released, wake moves with flow
         [xygFSVortex_rel] = biotSavart(LEVortex, TEVortex, dt, np, vel(tc+1,:), alpha(tc+1), alphaDot(tc+1), xyBoundVortex_rel, gam, xygFSVortex_rel);
         tc = tc + 1;
-        iterationCounter = 0;
+        iterationCounter = 1;
+        i_hack = 0;
     end
     
 end
@@ -157,7 +169,7 @@ if plotTranslation == 1
     plotKinematics(dt,pos,vel);
 end
 
-[M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc), pos(tc,:), vel(tc,:), gam, xygFSVortex_rel, np, t, dt, Streamlines);
+[M,h] = streamfunctionPlotting(M, h, xm, ym, nx, ny, alpha(tc), pos(tc,:), vel(tc,:), gam, xygFSVortex_rel, np, t, dt, Streamlines,LEVortex);
 
 
 

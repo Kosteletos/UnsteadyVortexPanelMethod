@@ -1,5 +1,6 @@
-function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel, gam , xygFSVortex_rel, np, t, dt, Streamlines)
+function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel, gam , xygFSVortex_rel, np, t, dt, Streamlines,LEVortex)
  
+    global folder subfolder
 
     [xyPanel, ~, xyBoundVortex, ~] = makePanels(alpha_rad, pos, np);
     
@@ -54,22 +55,27 @@ function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel
 
     end
     plot(xyPanel(:,1),xyPanel(:,2),'k','linewidth',2);
+    set(gcf,'color','w');
     hold off 
     title(strcat('alpha (deg) = ',num2str(alpha_rad*180/pi,3), ';  V = [', num2str(vel(1)),', ',num2str(vel(2)), '];  t = ', num2str(t), ';  dt = ', num2str(dt), ';  Np = ', num2str(np)));
-    xlim([-3, 0.3]) % [-0.3,0.3] for 2 m/s^2
-    %ylim([-0.08, 0.08])
+    xlim([-15, 0.6]) % [-0.3,0.3] for 2 m/s^2
+    ylim([-1, 1])
     
     set(gca,'visible','off')
-    filename = 'test.gif';
+    if LEVortex == 1
+        filename = 'PM LEV.gif';
+    else
+        filename = 'PM.gif';
+    end
     
     frame = getframe(1);
     im = frame2im(frame);
     [imind,cm] = rgb2ind(im,256);
     
     if t == dt
-        imwrite(imind,cm,filename,'gif', 'Loopcount',inf);
+        imwrite(imind,cm,fullfile(folder,subfolder,filename),'gif', 'Loopcount',inf);
     else
-        imwrite(imind,cm,filename,'gif','DelayTime',0.1,'WriteMode','append');
+        imwrite(imind,cm,fullfile(folder,subfolder,filename),'gif','DelayTime',0.1,'WriteMode','append');
     end
         
     
