@@ -3,7 +3,7 @@ function plotForces(Lift, Lift_am, LEVortex, alpha, alphaDot, pos, vel, dt)%, PI
 
 global chord rho folder subfolder
 
-characteristic_velocity = abs(vel(101,1));
+characteristic_velocity = abs(vel(10,1));
 
 length = size(Lift);
 t = 0:dt:(dt*length);

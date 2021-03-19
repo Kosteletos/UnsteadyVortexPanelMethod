@@ -59,7 +59,7 @@ function [M,h] = streamfunctionPlotting(M,h, xm, ym, nx, ny, alpha_rad, pos, vel
     hold off 
     title(strcat('alpha (deg) = ',num2str(alpha_rad*180/pi,3), ';  V = [', num2str(vel(1)),', ',num2str(vel(2)), '];  t = ', num2str(t), ';  dt = ', num2str(dt), ';  Np = ', num2str(np)));
     xlim([-15, 0.6]) % [-0.3,0.3] for 2 m/s^2
-    ylim([-1, 1])
+    ylim([-3, 3])
     
     set(gca,'visible','off')
     if LEVortex == 1
